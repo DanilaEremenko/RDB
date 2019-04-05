@@ -69,6 +69,8 @@ CREATE TABLE Way_of_cooking_product
 
 
 
+
+
 /*products container*/
 CREATE TABLE Refregerator
 (
@@ -77,13 +79,17 @@ CREATE TABLE Refregerator
 	market_name_id INTEGER,
 	price INTEGER,
 	disc_price  INTEGER,	/*discount price*/
-	day_of_buying INTEGER,
-        expire_date INTEGER,
+        buying_date DATE,
+	day_before_expiring INTEGER,
         amount INTEGER,
 	
 	FOREIGN KEY(product_id) REFERENCES Product(id),
 	FOREIGN KEY (market_name_id) REFERENCES Market_name (id)
 );
+
+
+
+/*some enum-tables initializing--------------------------------------*/
 
 alter table Way_of_cooking_product
 ADD FOREIGN KEY (product_id) REFERENCES Product(id);
@@ -104,6 +110,7 @@ insert into product_type values(4,'fish');
 insert into product_type values(5,'garnish');
 insert into product_type values(6,'sauce');
 insert into product_type values(7,'milk-product');
+insert into product_type values(8,'starter');
 
 /*way_of_cooking init*/
 insert into way_of_cooking values (1,'fry');
@@ -111,6 +118,9 @@ insert into way_of_cooking values (2,'boil');
 insert into way_of_cooking values (3,'bake');
 
 
+
+
+/*some common products initializing--------------------------------------*/
 
 /*product 1 example
  pasta, bariila, high-priority, not ready, garnish
@@ -131,6 +141,20 @@ insert into product values (2,'narsharab','kinto',2,1,6);
  */
 insert into product values (3, 'yogurt','epica',2,1,7);
 
+
 /*product 4 example
- 
- */
+ loaf, karavai, hight-priority, ready, started
+*/
+insert into product values (4, 'loaf', 'karavai', 2, 1, 8);
+
+
+
+/*refregerator filling example--------------------------------------*/
+/*id, loaf, okay, 59 rub, 45 rub, today, 14 days, 2 packs*/
+insert into refregerator values (1, 4, 1, 59, 45, current_date, 14, 2);
+
+/*id, loaf, okay, 304 rub, 220 rub, today, 700 days, 2 bottle*/
+insert into refregerator values (2, 2, 1, 304, 220, current_date, 700, 1);
+
+/*id, yogurt, okay, 50 rub, 39 rub, today, 32 days, 4 packs */
+insert into refregerator values (3, 3, 1, 50, 39, current_date, 32, 4);
