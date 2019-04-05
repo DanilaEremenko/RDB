@@ -48,12 +48,11 @@ CREATE TABLE Product
 	priority INTEGER,/*for absent products*/
 
 	cook_condition_id INTEGER,
-	market_name_id INTEGER,
 	product_type_id INTEGER,
 	
 	FOREIGN KEY (cook_condition_id)  REFERENCES Cook_condition (id),
-	FOREIGN KEY (market_name_id) REFERENCES Market_name (id),
-	FOREIGN KEY (product_type_id) REFERENCES Product_type (id)	
+	FOREIGN KEY (product_type_id) REFERENCES Product_type (id)
+
 );
 
 /*many-to-many linking table*/
@@ -75,12 +74,15 @@ CREATE TABLE Refregerator
 (
 	id SERIAL PRIMARY KEY,
 	product_id INTEGER,
+	market_name_id INTEGER,
 	price INTEGER,
 	disc_price  INTEGER,	/*discount price*/
 	day_of_buying INTEGER,
         expire_date INTEGER,
         amount INTEGER,
-	FOREIGN KEY(product_id) REFERENCES Product(id)
+	
+	FOREIGN KEY(product_id) REFERENCES Product(id),
+	FOREIGN KEY (market_name_id) REFERENCES Market_name (id)
 );
 
 alter table Way_of_cooking_product
@@ -100,6 +102,8 @@ insert into product_type values(2,'vegetable');
 insert into product_type values(3,'meat');
 insert into product_type values(4,'fish');
 insert into product_type values(5,'garnish');
+insert into product_type values(6,'sauce');
+insert into product_type values(7,'milk-product');
 
 /*way_of_cooking init*/
 insert into way_of_cooking values (1,'fry');
@@ -107,7 +111,26 @@ insert into way_of_cooking values (2,'boil');
 insert into way_of_cooking values (3,'bake');
 
 
-/*TODO product 1 example*/
+
+/*product 1 example
+ pasta, bariila, high-priority, not ready, garnish
+ boil
+ */
+insert into product values (1,'pasta','barilla',2,2,5);
+insert into way_of_cooking_product values (1,2,1);
 
 
+/*product 2 example
+ narsharab, kinto, high-priority, ready, sauce
+ */
+insert into product values (2,'narsharab','kinto',2,1,6);
 
+
+/*product 3 example
+ yogurt, epica, high-priority, ready, milk-product
+ */
+insert into product values (3, 'yogurt','epica',2,1,7);
+
+/*product 4 example
+ 
+ */
