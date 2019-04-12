@@ -38,7 +38,7 @@ def get_input_str(title=None, min_size=1, max_size=15):
             print("%s not an string\n" % res)
 
 
-def choose_variant(title, variants):
+def choose_variant_from_dict(title, variants):
     variants_str = ""
     for n, name in variants.items(): variants_str += "%d:%s\n" % (n, name)
 
@@ -51,8 +51,22 @@ def choose_variant(title, variants):
             print("Unexpected value!\n")
 
 
+def choose_variant_from_turp(title, variants):
+    variants_str = ""
+    for n, name in variants: variants_str += "%d:%s\n" % (n, name)
+
+    while True:
+        answ = get_input_int(title="CHOOSE %s\n%s" % (title, variants_str))
+
+        for var in variants:
+            if var.__contains__(answ):
+                return answ
+            else:
+                print("Unexpected value!\n")
+
+
 def add_into_refregerator(cursor):
-    way = choose_variant("WAY OF ADDING", {1: 'random', 2: 'not random'})
+    way = choose_variant_from_dict("WAY OF ADDING", {1: 'random', 2: 'not random'})
 
     if way == 1:
         min = 1
@@ -103,11 +117,18 @@ def add_into_refregerator(cursor):
 def add_into_product():
     cursor.execute("select count(id) from product;")
     prid = cursor.fetchall()[0][0]
+
     name = get_input_str(title="input name of product:")
+
     mark = get_input_str(title="input mark name:")
-    priority = get_input_int(title="input pririty[0-2]", min=0, max=2)
-    cook_cond_id = get_input_int(title="input cook condition id[1-2]", min=1, max=2)
-    pr_type = get_input_int(title="input product type id [1-8", min=1, max=8)
+
+    priority = choose_variant_from_dict(title="CHOOSE PRIORITY:", variants={0: 'low', 1: 'normal', 2: 'high'})
+
+    cursor.execute("select * from cook_condition;")
+    cook_cond_id = choose_variant_from_turp(title="CHOOSE COOK CONDITION", variants=cursor.fetchall())
+
+    cursor.execute("select * from product_type;")
+    pr_type = choose_variant_from_turp(title="CHOOSE PRODUCT TYPE", variants=cursor.fetchall())
 
     cursor.execute("insert into product values(%d,%s,%s,%d,%d,%d);" %
                    (prid, name, mark, priority, cook_cond_id, pr_type))
@@ -125,7 +146,7 @@ if __name__ == '__main__':
     while not fill_complete:
 
         print("-------------------------------")
-        ti = choose_variant("TABLE", {1: 'refregerator', 2: 'product', 3: 'exit'})
+        ti = choose_variant_from_dict("TABLE", {1: 'refregerator', 2: 'product', 3: 'exit'})
 
         if ti == 1:
             add_into_refregerator(cursor)
@@ -134,7 +155,9 @@ if __name__ == '__main__':
         elif ti == 3:
             fill_complete = True
 
-    conn.commit()
+    commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
+    if commit_allowed:
+        conn.commit()
     cursor.close()
     conn.close()
 # select table_name from information_schema.tables;
