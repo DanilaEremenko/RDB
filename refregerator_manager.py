@@ -22,6 +22,22 @@ def get_input_int(title=None, min=None, max=None):
             print("%s not an integer\n" % res)
 
 
+def get_input_str(title=None, min_size=1, max_size=15):
+    while True:
+        if title != None:
+            print(title)
+        res = input()
+        if not res.isdigit():
+
+            if (res.__len__() >= min_size and res.__len__() <= max_size):
+                return res
+            else:
+                print("%s isn't between [%d,%d]" % (res, min_size, max_size))
+
+        else:
+            print("%s not an string\n" % res)
+
+
 def choose_variant(title, variants):
     variants_str = ""
     for n, name in variants.items(): variants_str += "%d:%s\n" % (n, name)
@@ -43,14 +59,37 @@ def add_into_refregerator(cursor):
         max = 50
         num = get_input_int(title="HOW MANY?[%d - %d]" % (min, max), min=min, max=max)
 
+        # id in refregerator
+        cursor.execute("select count(id) from refregerator;")
+        rid = cursor.fetchall()[0][0]
+
+        # product_id bounds
+        prmin_id = 1
         cursor.execute("select count(id) from product;")
-        min_id = 1
-        max_id = cursor.fetchall()[0][0]
+        prmax_id = cursor.fetchall()[0][0]
+
+        # market_name_id bounds
+        markmin_id = 1
+        cursor.execute("select count(id) from market_name;")
+        markmax_id = cursor.fetchall()[0][0]
 
         for i in range(0, num):
-            product_id = np.random.randint(min_id, max_id + 1)
-            print("product_id = %d" % product_id)
-            continue  # TODO
+            rid += 1
+            product_id = np.random.randint(prmin_id, prmax_id + 1)
+            markname_id = np.random.randint(markmin_id, markmax_id + 1)
+            price = np.random.randint(20, 400)
+            disc_price = np.random.randint(1, 100)
+            day_before_expiring = np.random.randint(14, 700)
+            amount = np.random.randint(1, 5)
+
+            cursor.execute("insert into refregerator values(%d,%d,%d,%d,%d,%s,%d,%d);" %
+                           (rid, product_id, markname_id, price, disc_price, "current_date", day_before_expiring,
+                            amount))
+
+            print("insert into refregerator values (%d,%d,%d,%d,%d,%s,%d,%d);" %
+                  (rid, product_id, markname_id, price, disc_price, "current_date", day_before_expiring,
+                   amount))
+
 
 
     elif way == 2:
@@ -62,11 +101,24 @@ def add_into_refregerator(cursor):
 
 
 def add_into_product():
-    pass
+    cursor.execute("select count(id) from product;")
+    prid = cursor.fetchall()[0][0]
+    name = get_input_str(title="input name of product:")
+    mark = get_input_str(title="input mark name:")
+    priority = get_input_int(title="input pririty[0-2]", min=0, max=2)
+    cook_cond_id = get_input_int(title="input cook condition id[1-2]", min=1, max=2)
+    pr_type = get_input_int(title="input product type id [1-8", min=1, max=8)
+
+    cursor.execute("insert into product values(%d,%s,%s,%d,%d,%d);" %
+                   (prid, name, mark, priority, cook_cond_id, pr_type))
+
+    print("insert into product values(%d,%s,%s,%d,%d,%d);" %
+          (prid, name, mark, priority, cook_cond_id, pr_type))
 
 
 if __name__ == '__main__':
-    conn = psycopg2.connect(dbname='refregerator', user='postgres', host='localhost')
+    password = input("Input password for role \'danila\'")
+    conn = psycopg2.connect(dbname='refregerator', user='danila', password=password, host='localhost')
     cursor = conn.cursor()
 
     fill_complete = False
@@ -82,6 +134,7 @@ if __name__ == '__main__':
         elif ti == 3:
             fill_complete = True
 
+    conn.commit()
     cursor.close()
     conn.close()
 # select table_name from information_schema.tables;
