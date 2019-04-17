@@ -1,5 +1,6 @@
 import psycopg2
 import numpy as np
+from random_word import RandomWords
 
 
 def get_input_int(title=None, min=None, max=None):
@@ -138,8 +139,9 @@ def add_into_product():
 
 
 if __name__ == '__main__':
-    password = input("Input password for role \'danila\'")
-    conn = psycopg2.connect(dbname='refregerator', user='danila', password=password, host='localhost')
+    login = "refregerator_manager"
+    password = input("Input password for role \'%s\'" % login)
+    conn = psycopg2.connect(dbname='refregerator', user=login, password=password, host='localhost')
     cursor = conn.cursor()
 
     fill_complete = False
@@ -160,6 +162,7 @@ if __name__ == '__main__':
         conn.commit()
     cursor.close()
     conn.close()
+
 # select table_name from information_schema.tables;
 # cursor.execute('SELECT * FROM refregerator')
 # records = cursor.fetchall()

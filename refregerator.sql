@@ -49,7 +49,7 @@ CREATE TABLE Product
 
 	cook_condition_id INTEGER,
 	product_type_id INTEGER,
-	
+
 	FOREIGN KEY (cook_condition_id)  REFERENCES Cook_condition (id),
 	FOREIGN KEY (product_type_id) REFERENCES Product_type (id)
 
@@ -82,7 +82,7 @@ CREATE TABLE Refregerator
         buying_date DATE,
 	day_before_expiring INTEGER,
         amount INTEGER,
-	
+
 	FOREIGN KEY(product_id) REFERENCES Product(id),
 	FOREIGN KEY (market_name_id) REFERENCES Market_name (id)
 );
@@ -93,7 +93,7 @@ CREATE TABLE Refregerator
 
 alter table Way_of_cooking_product
 ADD FOREIGN KEY (product_id) REFERENCES Product(id);
-	
+
 /*cook_coniditon init*/
 insert into cook_condition values (1,'ready');
 insert into cook_condition values (2,'not ready');
@@ -158,3 +158,9 @@ insert into refregerator values (2, 2, 1, 304, 220, current_date, 700, 1);
 
 /*id, yogurt, okay, 50 rub, 39 rub, today, 32 days, 4 packs */
 insert into refregerator values (3, 3, 1, 50, 39, current_date, 32, 4);
+
+/*TODO if not exist*/
+CREATE ROLE refregerator_manager WITH LOGIN PASSWORD '1234';
+grant ALL on TABLE refregerator to refregerator_manager ;
+grant ALL on TABLE product to refregerator_manager ;
+grant ALL on TABLE market_name to refregerator_manager ;
