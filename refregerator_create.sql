@@ -1,29 +1,18 @@
-/*delete all tables
-drop table cook_condition cascade;
-drop table market_name cascade;
-drop table product_type cascade;
-drop table way_of_cooking cascade;
-drop table product cascade;
-drop table refregerator cascade;
-drop table way_of_cooking_product cascade;
-*/
-
-
-/*examples:ready, not ready*/
+/*------------------------------- examples:ready, not ready --------------------------------*/
 CREATE TABLE Cook_condition
 (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(15) NOT NULL UNIQUE
 );
 
-/*examples:okay,lenta,pyatorochka*/
+/*-------------------- examples:okay,lenta,pyatorochka --------------------------------------*/
 CREATE TABLE Market_name
 (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(15) NOT NULL UNIQUE
 );
 
-/*examples:fruit, vegetable, meat, fish*/
+/* --------------------- examples:fruit, vegetable, meat, fish ------------------------------*/
 CREATE TABLE Product_type
 (
 	id SERIAL PRIMARY KEY,
@@ -31,7 +20,7 @@ CREATE TABLE Product_type
 );
 
 
-/*examples:fry, boil, bake*/
+/* ------------------- examples:fry, boil, bake --------------------------------------------*/
 CREATE TABLE Way_of_cooking
 (
 	id SERIAL PRIMARY KEY,
@@ -39,7 +28,7 @@ CREATE TABLE Way_of_cooking
 
 );
 
-/*main item*/
+/*----------------------------------------- main item --------------------------------------*/
 CREATE TABLE Product
 (
 	id SERIAL PRIMARY KEY,
@@ -55,7 +44,7 @@ CREATE TABLE Product
 
 );
 
-/*many-to-many linking table*/
+/*------------------------------ many-to-many linking table ------------------------------*/
 CREATE TABLE Way_of_cooking_product
 (
         id SERIAL PRIMARY KEY,
@@ -69,9 +58,7 @@ CREATE TABLE Way_of_cooking_product
 
 
 
-
-
-/*products container*/
+/*----------------------------------- products container ----------------------------*/
 CREATE TABLE Refregerator
 (
 	id SERIAL PRIMARY KEY,
@@ -89,7 +76,7 @@ CREATE TABLE Refregerator
 
 
 
-/*some enum-tables initializing--------------------------------------*/
+/*----------------------------- some enum-tables initializing --------------------------------------*/
 
 alter table Way_of_cooking_product
 ADD FOREIGN KEY (product_id) REFERENCES Product(id);
@@ -120,7 +107,7 @@ insert into way_of_cooking values (3,'bake');
 
 
 
-/*some common products initializing--------------------------------------*/
+/*--------------------- some common products initializing --------------------------------------*/
 
 /*product 1 example
  pasta, bariila, high-priority, not ready, garnish
@@ -149,7 +136,7 @@ insert into product values (4, 'loaf', 'karavai', 2, 1, 8);
 
 
 
-/*refregerator filling example--------------------------------------*/
+/*----------------------- refregerator filling example --------------------------------------*/
 /*id, loaf, okay, 59 rub, 45 rub, today, 14 days, 2 packs*/
 insert into refregerator values (1, 4, 1, 59, 45, current_date, 14, 2);
 
@@ -161,6 +148,23 @@ insert into refregerator values (3, 3, 1, 50, 39, current_date, 32, 4);
 
 /*TODO if not exist*/
 CREATE ROLE refregerator_manager WITH LOGIN PASSWORD '1234';
-grant ALL on TABLE refregerator to refregerator_manager ;
-grant ALL on TABLE product to refregerator_manager ;
-grant ALL on TABLE market_name to refregerator_manager ;
+
+/*------------ grants for manager -----------------*/
+
+grant SELECT on TABLE cook_condition to refregerator_manager;
+grant REFERENCES on TABLE cook_condition to refregerator_manager;
+
+grant SELECT on TABLE Product_type to refregerator_manager;
+grant REFERENCES on TABLE Product_type to refregerator_manager;
+
+grant SELECT on TABLE Way_of_cooking to refregerator_manager;
+grant REFERENCES on TABLE Way_of_cooking to refregerator_manager;
+
+
+grant SELECT on TABLE Product to refregerator_manager;
+grant INSERT on TABLE Product to refregerator_manager;
+grant REFERENCES on TABLE Product to refregerator_manager;
+
+grant SELECT on TABLE refregerator to refregerator_manager;
+grant INSERT on TABLE refregerator to refregerator_manager;
+

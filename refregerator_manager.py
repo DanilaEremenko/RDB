@@ -143,7 +143,7 @@ if __name__ == '__main__':
     password = input("Input password for role \'%s\'" % login)
     conn = psycopg2.connect(dbname='refregerator', user=login, password=password, host='localhost')
     cursor = conn.cursor()
-
+    rw = RandomWords()
     fill_complete = False
     while not fill_complete:
 
