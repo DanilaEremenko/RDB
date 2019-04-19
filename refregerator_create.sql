@@ -32,7 +32,7 @@ create table way_of_cooking
 create table product
 (
     id                serial primary key,
-    name              varchar(15) not null unique,
+    name              varchar(15) not null,
     mark              varchar(15) not null,
     priority          integer,/*for absent products*/
 

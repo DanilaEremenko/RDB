@@ -97,7 +97,7 @@ def choose_variant_from_turp(title, variants):
 
 
 # ------------------------------------------------------------------------------------------
-def add_into_refregerator(cursor, min=1, max=50):
+def add_into_refregerator(cursor, min=1, max=2000):
     way = choose_variant_from_dict("WAY OF ADDING", {1: 'random', 2: 'not random'})
 
     if way == 1:
@@ -139,7 +139,7 @@ def add_into_refregerator(cursor, min=1, max=50):
 
 
 # ------------------------------------------------------------------------------------------
-def add_into_product(cursor, rw, min=1, max=50):
+def add_into_product(cursor, rw, min=1, max=2000):
     way = choose_variant_from_dict("WAY OF ADDING", {1: 'random', 2: 'not random'})
 
     # random
@@ -202,6 +202,24 @@ def add_into_product(cursor, rw, min=1, max=50):
 
         cursor.execute("insert into product values(%d,\'%s\',\'%s\',%d,%d,%d);" %
                        (prid, name, mark, priority, cook_cond_id, pr_type))
+    pass
+
+
+# ------------------------------------------------------------------------------------------
+def add_into_product_type(cursor, rw, min=1, max=2000):
+    # TODO
+    pass
+
+
+# ------------------------------------------------------------------------------------------
+def add_into_market_name(cursor, rw, min, max=2000):
+    # TODO
+    pass
+
+
+# ------------------------------------------------------------------------------------------
+def parse_params_from_cf(path):
+    # TODO
     pass
 
 
