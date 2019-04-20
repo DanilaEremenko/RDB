@@ -19,6 +19,13 @@ MAX_DAY_EXP = 700
 MIN_AM = 1
 MAX_AM = 5
 
+# types of fields
+PINT = 0
+PSTR = 1
+PREF = 2
+PDATE = 3
+PID = 4
+
 
 # ------------------------------------------------------------------------------------------
 def get_input_int(title=None, min=None, max=None):
@@ -97,129 +104,67 @@ def choose_variant_from_turp(title, variants):
 
 
 # ------------------------------------------------------------------------------------------
-def add_into_refregerator(cursor, min=1, max=2000):
+def add_into_table(cursor, rw, table_name, fields, bounds=None, min=1, max=2000):
+    '''
+    :param cursor: cursor to database
+    :param rw: random word
+    :param table_name: name of fielded table
+    :param fields: dictionary that contains fields in keys and types in values
+    :param bounds: bounds for int fields
+    :param min: min amount of randomized lines
+    :param max: max amount of randomized lines
+    :return: pass
+    '''
     way = choose_variant_from_dict("WAY OF ADDING", {1: 'random', 2: 'not random'})
 
     if way == 1:
         num = get_input_int(title="HOW MANY?[%d - %d]" % (min, max), min=min, max=max)
 
         for i in range(0, num):
-            # id in refregerator
-            cursor.execute("select count(id) from refregerator;")
-            rid = cursor.fetchall()[0][0] + 1
 
-            # product_id bounds
-            (prmin_id, prmax_id, products) = get_table_turp("product")
-            idp = np.random.randint(low=prmin_id, high=prmax_id)
-            product_id = products[idp][0]
+            request = "insert into %s values(" % table_name
 
-            # market_name_id bounds
-            (markmin_id, markmax_id, markets) = get_table_turp("market_name")
-            idp = np.random.randint(low=markmin_id, high=markmax_id)
-            markname_id = markets[idp][0]
+            bi = 0
+            for field, partype in fields.items():
+                if partype == PINT:
+                    MIN_B = bounds[bi][0]
+                    MAX_B = bounds[bi][1]
+                    request += "%d," % np.random.randint(MIN_B, MAX_B)
+                    bi += 1
 
-            price = np.random.randint(MIN_PRICE, MAX_PRICE)
-            disc_price = np.random.randint(MIN_DPRICE, MAX_DPRICE)
-            day_before_expiring = np.random.randint(MIN_DAY_EXP, MAX_DAY_EXP)
-            amount = np.random.randint(MIN_AM, MAX_AM)
+                elif partype == PSTR:  # TODO add bounds control
+                    word = rw.random_word()
+                    while word.__len__() > VCH_MAX_LEN:
+                        word = rw.random_word()
+                    request += "\'%s\'," % word
 
-            cursor.execute("insert into refregerator values(%d,%d,%d,%d,%d,%s,%d,%d);" %
-                           (rid, product_id, markname_id, price, disc_price, "current_date", day_before_expiring,
-                            amount))
+                elif partype == PREF:
+                    (min_id, max_id, lines) = get_table_turp(field)
+                    currid = np.random.randint(low=min_id, high=max_id)
+                    request += "%d," % lines[currid][0]
+                elif partype == PDATE:
+                    request += "%s," % "current_date"
+                elif partype == PID:
+                    cursor.execute("select count(id) from %s;" % table_name)
+                    rid = cursor.fetchall()[0][0] + 1
+                    request += "%d," % rid
 
-            print("insert into refregerator values (%d,%d,%d,%d,%d,\'%s\',%d,%d);" %
-                  (rid, product_id, markname_id, price, disc_price, "current_date", day_before_expiring,
-                   amount))
+            request = request[:request.__len__() - 1] + ")"
+
+            print(request)
+            cursor.execute(request)
+
 
 
 
     elif way == 2:
-        print("not random still isn't working")  # TODO
-    pass
-
-
-# ------------------------------------------------------------------------------------------
-def add_into_product(cursor, rw, min=1, max=2000):
-    way = choose_variant_from_dict("WAY OF ADDING", {1: 'random', 2: 'not random'})
-
-    # random
-    if way == 1:
-        num = get_input_int(title="HOW MANY?[%d - %d]" % (min, max), min=min, max=max)
-
-        for i in range(0, num):
-            # next id
-            cursor.execute("select max(id) from product;")
-            prid = cursor.fetchall()[0][0] + 1
-
-            name = rw.random_word()
-            while name.__len__() > VCH_MAX_LEN:
-                name = rw.random_word()
-
-            mark = rw.random_word()
-            while mark.__len__() > VCH_MAX_LEN:
-                mark = rw.random_word()
-
-            priority = np.random.randint(low=MIN_PRIOR, high=MAX_PRIOR + 1)
-
-            # cook conditions info
-            (ccond_min_id, ccond_max_id, cook_conds) = get_table_turp("cook_condition")
-            idp = np.random.randint(low=ccond_min_id, high=ccond_max_id)
-            cook_cond_id = cook_conds[idp][0]
-
-            # product types info
-            (prtype_min_id, prtype_max_id, prtypes) = get_table_turp("product_type")
-            idp = np.random.randint(low=prtype_min_id, high=prtype_max_id)
-            pr_type = prtypes[idp][0]
-
-            print("insert into product values(%d,\'%s\',\'%s\',%d,%d,%d);" %
-                  (prid, name, mark, priority, cook_cond_id, pr_type))
-
-            cursor.execute("insert into product values(%d,\'%s\',\'%s\',%d,%d,%d);" %
-                           (prid, name, mark, priority, cook_cond_id, pr_type))
-
-
-
-
-    # not random
-    elif way == 2:
-        cursor.execute("select max(id) from product;")
-        prid = cursor.fetchall()[0][0] + 1
-
-        name = get_input_str(title="input name of product:")
-
-        mark = get_input_str(title="input mark name:")
-
-        priority = choose_variant_from_dict(title="CHOOSE PRIORITY:", variants={0: 'low', 1: 'normal', 2: 'high'})
-
-        cursor.execute("select * from cook_condition;")
-        cook_cond_id = choose_variant_from_turp(title="CHOOSE COOK CONDITION", variants=cursor.fetchall())
-
-        cursor.execute("select * from product_type;")
-        pr_type = choose_variant_from_turp(title="CHOOSE PRODUCT TYPE", variants=cursor.fetchall())
-
-        print("insert into product values(%d,\'%s\',\'%s\',%d,%d,%d);" %
-              (prid, name, mark, priority, cook_cond_id, pr_type))
-
-        cursor.execute("insert into product values(%d,\'%s\',\'%s\',%d,%d,%d);" %
-                       (prid, name, mark, priority, cook_cond_id, pr_type))
-    pass
-
-
-# ------------------------------------------------------------------------------------------
-def add_into_product_type(cursor, rw, min=1, max=2000):
-    # TODO
-    pass
-
-
-# ------------------------------------------------------------------------------------------
-def add_into_market_name(cursor, rw, min, max=2000):
-    # TODO
+        print("not random still isn't working")  # TODO add
     pass
 
 
 # ------------------------------------------------------------------------------------------
 def parse_params_from_cf(path):
-    # TODO
+    # TODO add
     pass
 
 
@@ -240,9 +185,20 @@ if __name__ == '__main__':
         ti = choose_variant_from_dict("TABLE", {1: 'refregerator', 2: 'product', 3: 'exit'})
 
         if ti == 1:
-            add_into_refregerator(cursor)
+            add_into_table(
+                cursor, rw, table_name="refregerator",
+                fields={'id': PID, 'product': PREF, 'market_name': PREF, 'price': PINT, 'disc_price': PINT,
+                        'buying_date': PDATE,
+                        'day_before_expiring': PINT, 'amount': PINT},
+                bounds=[(MIN_PRICE, MAX_PRICE), (MIN_DPRICE, MAX_DPRICE), (MIN_DAY_EXP, MAX_DAY_EXP), (MIN_AM, MAX_AM)],
+            )
         elif ti == 2:
-            add_into_product(cursor, rw)
+            add_into_table(
+                cursor, rw, table_name="product",
+                fields={'id': PID, 'name': PSTR, 'mark': PSTR, 'priority': PINT, 'cook_condition': PREF,
+                        'product_type': PREF},
+                bounds=[(MIN_PRIOR, MAX_PRIOR)]
+            )
         elif ti == 3:
             fill_complete = True
 
