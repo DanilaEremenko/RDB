@@ -71,7 +71,7 @@ def choose_variant_from_dict(title, variants):
     for n, name in variants.items(): variants_str += "%d:%s\n" % (n, name)
 
     while True:
-        answ = get_input_int(title="CHOOSE %s\n%s" % (title, variants_str))
+        answ = get_input_int(title="%s\n%s" % (title, variants_str))
 
         if variants.keys().__contains__(answ):
             return answ
@@ -81,20 +81,59 @@ def choose_variant_from_dict(title, variants):
 
 # ------------------------------------------------------------------------------------------
 def get_table_turp(table_name):
-    min = 0
     cursor.execute("select * from %s;" % table_name)
     table = cursor.fetchall()
-    max = table.__len__()
-    return (min, max, table)
+    min_id = 0
+    max_id = table.__len__()
+    return (min_id, max_id, table)
+
+
+# ------------------------------------------------------------------------------------------
+def get_free_ids(cursor, table_name):
+    """
+    :param cursor:
+    :param table_name:
+    :return: array of free ids in table
+    """
+
+    cursor.execute("select id from %s;" % table_name)
+    ids = np.array(cursor.fetchall())
+    shids = ids + 1
+    fids = np.empty(0, dtype=int)
+    for shid in shids:
+        if not ids.__contains__(shid):
+            fids = np.append(fids, shid)
+    return fids
+
+
+# ------------------------------------------------------------------------------------------
+def get_free_id(cursor, table_name):
+    """
+    :param cursor:
+    :param table_name:
+    :return: array of free ids in table
+    """
+    cursor.execute("select max(id) from %s" % table_name)
+    max = cursor.fetchall()[0][0]
+    if max == None:
+        return 1
+    else:
+        return max + 1
 
 
 # ------------------------------------------------------------------------------------------
 def choose_variant_from_turp(title, variants):
+    """
+    Correct processing of illegal value works.
+    :param title:
+    :param variants:
+    :return: one of allowed number
+    """
     variants_str = ""
     for n, name in variants: variants_str += "%d:%s\n" % (n, name)
 
     while True:
-        answ = get_input_int(title="CHOOSE %s\n%s" % (title, variants_str))
+        answ = get_input_int(title="%s\n%s" % (title, variants_str))
 
         for var in variants:
             if var.__contains__(answ):
@@ -105,7 +144,7 @@ def choose_variant_from_turp(title, variants):
 
 # ------------------------------------------------------------------------------------------
 def add_into_table(cursor, rw, table_name, fields, bounds=None, min=1, max=2000):
-    '''
+    """
     :param cursor: cursor to database
     :param rw: random word
     :param table_name: name of fielded table
@@ -114,8 +153,8 @@ def add_into_table(cursor, rw, table_name, fields, bounds=None, min=1, max=2000)
     :param min: min amount of randomized lines
     :param max: max amount of randomized lines
     :return: pass
-    '''
-    way = choose_variant_from_dict("WAY OF ADDING", {1: 'random', 2: 'not random'})
+    """
+    way = choose_variant_from_dict("CHOOSE WAY OF ADDING FOR TABLE \'%s\'" % table_name, {1: 'random', 2: 'not random'})
 
     if way == 1:
         num = get_input_int(title="HOW MANY?[%d - %d]" % (min, max), min=min, max=max)
@@ -145,8 +184,7 @@ def add_into_table(cursor, rw, table_name, fields, bounds=None, min=1, max=2000)
                 elif partype == PDATE:
                     request += "%s," % "current_date"
                 elif partype == PID:
-                    cursor.execute("select count(id) from %s;" % table_name)
-                    rid = cursor.fetchall()[0][0] + 1
+                    rid = get_free_id(cursor, table_name)
                     request += "%d," % rid
 
             request = request[:request.__len__() - 1] + ")"
@@ -182,8 +220,13 @@ if __name__ == '__main__':
     while not fill_complete:
 
         print("-------------------------------")
-        ti = choose_variant_from_dict("TABLE", {1: 'refregerator', 2: 'product', 3: 'exit'})
+        # define tables, which will be filled
+        ti = choose_variant_from_dict(
+            "CHOOSE TABLE",
+            {1: 'refregerator', 2: 'product', 3: 'exit'}
+        )
 
+        # ------------------- change tables : refregerator -------------------------------------
         if ti == 1:
             add_into_table(
                 cursor, rw, table_name="refregerator",
@@ -192,6 +235,9 @@ if __name__ == '__main__':
                         'day_before_expiring': PINT, 'amount': PINT},
                 bounds=[(MIN_PRICE, MAX_PRICE), (MIN_DPRICE, MAX_DPRICE), (MIN_DAY_EXP, MAX_DAY_EXP), (MIN_AM, MAX_AM)],
             )
+
+
+        # --------------- change tables : product & way_of cooking product ----------------------
         elif ti == 2:
             add_into_table(
                 cursor, rw, table_name="product",
@@ -199,9 +245,32 @@ if __name__ == '__main__':
                         'product_type': PREF},
                 bounds=[(MIN_PRIOR, MAX_PRIOR)]
             )
+
+            # -------------------- fill way_of_cooking_product --------------------------------------------
+            # add >=1 refererence to way_of_cooking_product for every product with condition 'not ready'
+            (min_wid, max_wid, lines) = get_table_turp('way_of_cooking')
+
+            # calculate request id
+            rid = get_free_id(cursor, "way_of_cooking_product")
+
+            # select only ids of 'not ready'
+            cursor.execute("select id from product where cook_condition_id = 2;")
+
+            for prod_id in np.array(cursor.fetchall()):
+                way_id = np.random.randint(min_wid+1,max_wid+1)
+                print("insert into way_of_cooking_product values (%d, %d, %d)" % (rid, prod_id, way_id))
+                cursor.execute(
+                    "insert into way_of_cooking_product values (%d, %d, %d)" % (rid, prod_id, way_id))
+                rid += 1
+
+
+
+
+        # ------------------------------ exit from program ------------------------------
         elif ti == 3:
             fill_complete = True
 
+    # -------------------------- commit or not commit changes ---------------------------
     commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
     if commit_allowed:
         conn.commit()
