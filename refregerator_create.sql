@@ -34,26 +34,39 @@ create table product
   id                serial primary key,
   name              varchar(15) not null,
   mark              varchar(15) not null,
-  priority          integer,/*for absent products*/
+  priority          integer     not null,/*for absent products*/
 
-  cook_condition_id integer,
-  product_type_id   integer,
+  cook_condition_id integer     not null,
+  product_type_id   integer     not null,
 
   foreign key (cook_condition_id) references cook_condition (id),
   foreign key (product_type_id) references product_type (id)
 
 );
 
-/*------------------------------ many-to-many linking table ------------------------------*/
-create table way_of_cooking_product
+
+/*----------------------------- available recipes -----------------------------------------*/
+create table recipe
 (
   id                serial primary key,
+  name              varchar(50) not null,
 
-  product_id        integer,
-
-  way_of_cooking_id integer,
+  way_of_cooking_id integer     not null,
   foreign key (way_of_cooking_id) references way_of_cooking (id)
 
+);
+
+
+/*------------------------------ many-to-many linking table ------------------------------*/
+create table recipe_product
+(
+  id         serial primary key,
+
+  recipe_id  integer not null,
+  foreign key (recipe_id) references recipe (id),
+
+  product_id integer not null,
+  foreign key (product_id) references product (id)
 
 );
 
@@ -62,13 +75,13 @@ create table way_of_cooking_product
 create table refregerator
 (
   id                  serial primary key,
-  product_id          integer,
-  market_name_id      integer,
-  price               integer,
-  disc_price          integer, /*discount price*/
-  buying_date         date,
-  day_before_expiring integer,
-  amount              integer,
+  product_id          integer not null,
+  market_name_id      integer not null,
+  price               integer not null,
+  disc_price          integer not null, /*discount price*/
+  buying_date         date    not null,
+  day_before_expiring integer not null,
+  amount              integer not null,
 
   foreign key (product_id) references product (id),
   foreign key (market_name_id) references market_name (id)
@@ -76,10 +89,6 @@ create table refregerator
 
 
 /*----------------------------- enum-tables initializing --------------------------------------*/
-
-alter table way_of_cooking_product
-  add foreign key (product_id) references product (id);
-
 /*cook_coniditon init*/
 insert into cook_condition
 values (1, 'ready');
@@ -151,8 +160,6 @@ values (3, 'bake');
  */
 insert into product
 values (1, 'pasta', 'barilla', 2, 2, 5);
-insert into way_of_cooking_product
-values (1, 1, 2);
 
 
 /*product 2 example
@@ -198,7 +205,7 @@ login
 password
 '1234';
 
-/*------------ grants for manager -----------------*/
+/*----------------------------------- grants for manager -------------------------------------*/
 
 grant select on table cook_condition to refregerator_manager;
 grant references on table cook_condition to refregerator_manager;
@@ -213,11 +220,16 @@ grant select on table market_name to refregerator_manager;
 grant references on table market_name to refregerator_manager;
 
 
-grant select on table way_of_cooking_product to refregerator_manager;
-grant insert on table way_of_cooking_product to refregerator_manager;
-grant references on table way_of_cooking_product to refregerator_manager;
-grant delete on table way_of_cooking_product to refregerator_manager;
+grant select on table recipe to refregerator_manager;
+grant insert on table recipe to refregerator_manager;
+grant references on table recipe to refregerator_manager;
+grant delete on table recipe to refregerator_manager;
 
+
+grant select on table recipe_product to refregerator_manager;
+grant insert on table recipe_product to refregerator_manager;
+grant references on table recipe_product to refregerator_manager;
+grant delete on table recipe_product to refregerator_manager;
 
 
 grant select on table product to refregerator_manager;
