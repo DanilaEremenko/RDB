@@ -2,6 +2,7 @@ import psycopg2
 import numpy as np
 from random_words import RandomWords
 import sys
+import json
 
 # ------------------------ parameters for generation -----------------------------------
 MAX_VCH_LEN = 0
@@ -221,23 +222,47 @@ def add_into_table(cursor, rw, table_name, fields, min_av, max_av, bounds=None):
 
 
 # ------------------------------ PARSING METHODS ----------------------------
-def parse_num(line):
-    res = ""
-    for s in line:
-        if s.isdigit():
-            res += s
-    return int(res)
-
-
-def parse_params_from_cf(path):
+def store_json(path):
     """
-    TODO what about macroses in python
-    Parse params from file.
+    Store dictionary with params to the file by the path.
     :param path:
-    :return:pass
+    :return:
     """
-    print("PARSING PARAMS FROM FILE %s..." % path, end="")
-    lines = [line for line in open(path, "r").readlines() if line.replace(" ", "") != '\n']
+    params_dict = {'MAX_VCH_LEN': 15,
+                   'MIN_PRIOR': 0,
+                   'MAX_PRIOR': 2,
+
+                   'MIN_PRICE': 20,
+                   'MAX_PRICE': 400,
+
+                   'MIN_DPRICE': 10,
+                   'MAX_DPRICE': 100,
+
+                   'MIN_DAY_EXP': 10,
+                   'MAX_DAY_EXP': 700,
+
+                   'MIN_AM': 1,
+                   'MAX_AM': 5,
+
+                   'MIN_ADD_AVAIL': 1,
+                   'MAX_ADD_AVAIL': 2000
+                   }
+    with open(path, "w") as fp:
+        json.dump(params_dict, fp)
+
+    pass
+
+
+def parse_json(path):
+    """
+    Load params from json file by path. Json file must contain dictionary.
+    :param path:
+    :return:
+    """
+    print("PARSING PARAMS FROM FILE %s... " % path, end="")
+
+    params_dict = json.load(open(path, 'r'))
+
     global MAX_VCH_LEN, MIN_PRIOR, MAX_PRIOR, \
         MIN_PRICE, MAX_PRICE, \
         MIN_DPRICE, MAX_DPRICE, \
@@ -245,25 +270,25 @@ def parse_params_from_cf(path):
         MIN_AM, MAX_AM, \
         MIN_ADD_AVAIL, MAX_ADD_AVAIL
 
-    MAX_VCH_LEN = parse_num(lines[0])
+    MAX_VCH_LEN = params_dict.__getitem__('MAX_VCH_LEN')
 
-    MIN_PRIOR = parse_num(lines[1])
-    MAX_PRIOR = parse_num(lines[2])
+    MIN_PRIOR = params_dict.__getitem__('MIN_PRIOR')
+    MAX_PRIOR = params_dict.__getitem__('MAX_PRIOR')
 
-    MIN_PRICE = parse_num(lines[3])
-    MAX_PRICE = parse_num(lines[4])
+    MIN_PRICE = params_dict.__getitem__('MIN_PRICE')
+    MAX_PRICE = params_dict.__getitem__('MAX_PRICE')
 
-    MIN_DPRICE = parse_num(lines[5])
-    MAX_DPRICE = parse_num(lines[6])
+    MIN_DPRICE = params_dict.__getitem__('MIN_DPRICE')
+    MAX_DPRICE = params_dict.__getitem__('MAX_DPRICE')
 
-    MIN_DAY_EXP = parse_num(lines[7])
-    MAX_DAY_EXP = parse_num(lines[8])
+    MIN_DAY_EXP = params_dict.__getitem__('MIN_DAY_EXP')
+    MAX_DAY_EXP = params_dict.__getitem__('MAX_DAY_EXP')
 
-    MIN_AM = parse_num(lines[9])
-    MAX_AM = parse_num(lines[10])
+    MIN_AM = params_dict.__getitem__('MIN_AM')
+    MAX_AM = params_dict.__getitem__('MAX_AM')
 
-    MIN_ADD_AVAIL = parse_num(lines[11])
-    MAX_ADD_AVAIL = parse_num(lines[12])
+    MIN_ADD_AVAIL = params_dict.__getitem__('MIN_ADD_AVAIL')
+    MAX_ADD_AVAIL = params_dict.__getitem__('MAX_ADD_AVAIL')
 
     print("ok")
 
@@ -273,10 +298,13 @@ def parse_params_from_cf(path):
 # ------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     if sys.argv.__len__() != 2:
-        raise ValueError("Illegal amount of arguments = %d" % sys.argv.__len__())
+        raise ValueError("Illegal amount of arguments = %d "
+                         "(path to json config file must be passed)" % sys.argv.__len__())
 
     print("-------------------------------")
-    parse_params_from_cf(sys.argv[1])
+    param_path = sys.argv[1]
+    # store_json(param_path)
+    parse_json(param_path)
     print("-------------------------------")
 
     login = "refregerator_manager"
@@ -309,7 +337,6 @@ if __name__ == '__main__':
                 max_av=MAX_ADD_AVAIL
             )
 
-
         # --------------- change tables : product & way_of cooking product ----------------------
         elif ti == 2:
             add_into_table(
@@ -339,7 +366,6 @@ if __name__ == '__main__':
                 min_av=MIN_ADD_AVAIL,
                 max_av=MAX_ADD_AVAIL
             )
-
 
         # ------------------------------ exit from program ------------------------------
         elif ti == 5:
