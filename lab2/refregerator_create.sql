@@ -91,65 +91,65 @@ create table refregerator
 /*----------------------------- enum-tables initializing --------------------------------------*/
 /*cook_coniditon init*/
 insert into cook_condition
-values (1, 'ready');
+values (default, 'ready');
 
 insert into cook_condition
-values (2, 'not ready');
+values (default, 'not ready');
 
 /*market_name init*/
 insert into market_name
-values (1, 'OKAY');
+values (default, 'OKAY');
 
 insert into market_name
-values (2, 'PYATOROCHKA');
+values (default, 'PYATOROCHKA');
 
 insert into market_name
-values (3, 'LENTA');
+values (default, 'LENTA');
 
 insert into market_name
-values (4, 'MAGNIT');
+values (default, 'MAGNIT');
 
 insert into market_name
-values (5, 'MISTER LOPATA');
+values (default, 'MISTER LOPATA');
 
 insert into market_name
-values (6, 'MISHA KOSINKA');
+values (default, 'MISHA KOSINKA');
 
 
 /*product_type init*/
 insert into product_type
-values (1, 'fruit');
+values (default, 'fruit');
 
 insert into product_type
-values (2, 'vegetable');
+values (default, 'vegetable');
 
 insert into product_type
-values (3, 'meat');
+values (default, 'meat');
 
 insert into product_type
-values (4, 'fish');
+values (default, 'fish');
 
 insert into product_type
-values (5, 'garnish');
+values (default, 'garnish');
 
 insert into product_type
-values (6, 'sauce');
+values (default, 'sauce');
 
 insert into product_type
-values (7, 'milk-product');
+values (default, 'milk-product');
 
 insert into product_type
-values (8, 'starter');
+values (default, 'starter');
 
 /*way_of_cooking init*/
 insert into way_of_cooking
-values (1, 'fry');
+values (default, 'fry');
 
 insert into way_of_cooking
-values (2, 'boil');
+values (default, 'boil');
 
 insert into way_of_cooking
-values (3, 'bake');
+values (default, 'bake');
 
 
 /*--------------------- some common products initializing --------------------------------------*/
@@ -159,42 +159,42 @@ values (3, 'bake');
  boil
  */
 insert into product
-values (1, 'pasta', 'barilla', 2, 2, 5);
+values (default, 'pasta', 'barilla', 2, 2, 5);
 
 
 /*product 2 example
  narsharab, kinto, high-priority, ready, sauce
  */
 insert into product
-values (2, 'narsharab', 'kinto', 2, 1, 6);
+values (default, 'narsharab', 'kinto', 2, 1, 6);
 
 
 /*product 3 example
  yogurt, epica, high-priority, ready, milk-product
  */
 insert into product
-values (3, 'yogurt', 'epica', 2, 1, 7);
+values (default, 'yogurt', 'epica', 2, 1, 7);
 
 
 /*product 4 example
  loaf, karavai, hight-priority, ready, started
 */
 insert into product
-values (4, 'loaf', 'karavai', 2, 1, 8);
+values (default, 'loaf', 'karavai', 2, 1, 8);
 
 
 /*----------------------- refregerator filling example --------------------------------------*/
 /*id, loaf, okay, 59 rub, 45 rub, today, 14 days, 2 packs*/
 insert into refregerator
-values (1, 4, 1, 59, 45, current_date, 14, 2);
+values (default, 4, 1, 59, 45, current_date, 14, 2);
 
 /*id, loaf, okay, 304 rub, 220 rub, today, 700 days, 2 bottle*/
 insert into refregerator
-values (2, 2, 1, 304, 220, current_date, 700, 1);
+values (default, 2, 1, 304, 220, current_date, 700, 1);
 
 /*id, yogurt, okay, 50 rub, 39 rub, today, 32 days, 4 packs */
 insert into refregerator
-values (3, 3, 1, 50, 39, current_date, 32, 4);
+values (default, 3, 1, 50, 39, current_date, 32, 4);
 
 /*todo if not exist*/
 create
