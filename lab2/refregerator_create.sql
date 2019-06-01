@@ -1,46 +1,46 @@
 /*------------------------------- examples:ready, not ready --------------------------------*/
 create table cook_condition
 (
-  id   serial primary key,
-  name varchar(15) not null unique
+    id   serial primary key,
+    name varchar(15) not null unique
 );
 
 /*-------------------- examples:okay,lenta,pyatorochka --------------------------------------*/
 create table market_name
 (
-  id   serial primary key,
-  name varchar(15) not null unique
+    id   serial primary key,
+    name varchar(15) not null unique
 );
 
 /* --------------------- examples:fruit, vegetable, meat, fish ------------------------------*/
 create table product_type
 (
-  id   serial primary key,
-  name varchar(15) not null unique
+    id   serial primary key,
+    name varchar(15) not null unique
 );
 
 
 /* ------------------- examples:fry, boil, bake --------------------------------------------*/
 create table way_of_cooking
 (
-  id   serial primary key,
-  name varchar(15) not null unique
+    id   serial primary key,
+    name varchar(15) not null unique
 
 );
 
 /*----------------------------------------- main item --------------------------------------*/
 create table product
 (
-  id                serial primary key,
-  name              varchar(15) not null,
-  mark              varchar(15) not null,
-  priority          integer     not null,/*for absent products*/
+    id                serial primary key,
+    name              varchar(15) not null,
+    mark              varchar(15) not null,
+    priority          integer     not null,/*for absent products*/
 
-  cook_condition_id integer     not null,
-  product_type_id   integer     not null,
+    cook_condition_id integer     not null,
+    product_type_id   integer     not null,
 
-  foreign key (cook_condition_id) references cook_condition (id),
-  foreign key (product_type_id) references product_type (id)
+    foreign key (cook_condition_id) references cook_condition (id),
+    foreign key (product_type_id) references product_type (id)
 
 );
 
@@ -48,11 +48,11 @@ create table product
 /*----------------------------- available recipes -----------------------------------------*/
 create table recipe
 (
-  id                serial primary key,
-  name              varchar(50) not null,
+    id                serial primary key,
+    name              varchar(50) not null,
 
-  way_of_cooking_id integer     not null,
-  foreign key (way_of_cooking_id) references way_of_cooking (id)
+    way_of_cooking_id integer     not null,
+    foreign key (way_of_cooking_id) references way_of_cooking (id)
 
 );
 
@@ -60,13 +60,13 @@ create table recipe
 /*------------------------------ many-to-many linking table ------------------------------*/
 create table recipe_product
 (
-  id         serial primary key,
+    id         serial primary key,
 
-  recipe_id  integer not null,
-  foreign key (recipe_id) references recipe (id),
+    recipe_id  integer not null,
+    foreign key (recipe_id) references recipe (id),
 
-  product_id integer not null,
-  foreign key (product_id) references product (id)
+    product_id integer not null,
+    foreign key (product_id) references product (id)
 
 );
 
@@ -74,17 +74,29 @@ create table recipe_product
 /*----------------------------------- products container ----------------------------*/
 create table refregerator
 (
-  id                  serial primary key,
-  product_id          integer not null,
-  market_name_id      integer not null,
-  price               integer not null,
-  disc_price          integer not null, /*discount price*/
-  buying_date         date    not null,
-  day_before_expiring integer not null,
-  amount              integer not null,
+    id                  serial primary key,
+    product_id          integer not null,
+    market_name_id      integer not null,
+    price               integer not null,
+    disc_price          integer not null, /*discount price*/
+    buying_date         date    not null,
+    day_before_expiring integer not null,
+    amount              integer not null,
 
-  foreign key (product_id) references product (id),
-  foreign key (market_name_id) references market_name (id)
+    foreign key (product_id) references product (id),
+    foreign key (market_name_id) references market_name (id)
+);
+
+/*----------------------------------- number of products for recipe ----------------*/
+create table recipe_product_num
+(
+
+    recipe_id   integer not null,
+    foreign key (recipe_id) references recipe (id),
+
+    product_num integer not null
+
+
 );
 
 
@@ -196,49 +208,14 @@ values (default, 2, 1, 304, 220, current_date, 700, 1);
 insert into refregerator
 values (default, 3, 1, 50, 39, current_date, 32, 4);
 
-/*todo if not exist*/
+
+/*------------------------------- create refregerator manager -------------------------*/
 create
-role
-refregerator_manager
-with
-login
-password
-'1234';
+    user
+    refregerator_manager
+    with
+    login
+    password
+        '1234';
 
-/*----------------------------------- grants for manager -------------------------------------*/
-
-grant select on table cook_condition to refregerator_manager;
-grant references on table cook_condition to refregerator_manager;
-
-grant select on table product_type to refregerator_manager;
-grant references on table product_type to refregerator_manager;
-
-grant select on table way_of_cooking to refregerator_manager;
-grant references on table way_of_cooking to refregerator_manager;
-
-grant select on table market_name to refregerator_manager;
-grant references on table market_name to refregerator_manager;
-
-
-grant select on table recipe to refregerator_manager;
-grant insert on table recipe to refregerator_manager;
-grant references on table recipe to refregerator_manager;
-grant delete on table recipe to refregerator_manager;
-
-
-grant select on table recipe_product to refregerator_manager;
-grant insert on table recipe_product to refregerator_manager;
-grant references on table recipe_product to refregerator_manager;
-grant delete on table recipe_product to refregerator_manager;
-
-
-grant select on table product to refregerator_manager;
-grant insert on table product to refregerator_manager;
-grant references on table product to refregerator_manager;
-grant delete on table product to refregerator_manager;
-
-
-grant select on table refregerator to refregerator_manager;
-grant insert on table refregerator to refregerator_manager;
-grant delete on table refregerator to refregerator_manager;
-
+grant postgres to refregerator_manager;

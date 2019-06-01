@@ -221,6 +221,14 @@ def add_into_table(cursor, rw, table_name, fields, min_av, max_av, bounds=None):
     pass
 
 
+# ------------------------------ run sql file --------------------------------
+def run_sql(addr):
+    sql_file = open(addr, 'r')
+    sql_code = ""
+    for line in sql_file.readlines(): sql_code += line
+    cursor.execute(sql_code)
+
+
 # ------------------------------ PARSING METHODS ----------------------------
 def store_json(path):
     """
@@ -374,6 +382,7 @@ if __name__ == '__main__':
     # -------------------------- commit or not commit changes ---------------------------
     commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
     if commit_allowed:
+        run_sql("../lab2/upd_rec_prod_num.sql")
         conn.commit()
     cursor.close()
     conn.close()
