@@ -1,3 +1,4 @@
+-------------------------- ОБЩАЯ ЧАСТЬ ---------------------------------------
 ------------------------------------------------------------------------------
 /*Сделайте выборку всех данных из каждой таблицы*/
 select *
@@ -138,3 +139,47 @@ where day_before_expiring = 0;
 delete
 from recipe_product
 where id = (select max(id) from recipe_product);
+
+
+----------------------------------------------------------------------------------------
+---------------------------- ИНДВИДУАЛЬНЫЕ ЗАДАНИЯ -------------------------------------
+
+------------------------------------------------------------------------------
+/*1.Вывести порядок приготовления блюда и ингридиенты*/
+select r.name recipe, wc.name how_to_cook, p.name products
+from recipe_product rp
+         join recipe r on rp.recipe_id = r.id
+         join way_of_cooking wc on r.way_of_cooking_id = wc.id
+         join product p on rp.product_id = p.id
+order by r.name;
+
+------------------------------------------------------------------------------
+/*2.Вывести блюда, которые есть в холодильнике, но не входят в рецепты*/
+select r.id, p.name
+from refregerator r
+         join product p on r.product_id = p.id
+where p.id not in (select rp.product_id from recipe_product rp);
+
+------------------------------------------------------------------------------
+/*3.Вывести рецепты, для приготовления блюд по которым не хватает не более 3-х ингридиентов.*/
+select *
+from (select rec_full.recipe, count(product_full) - count(product_from_refr) as missed_num
+      from (
+            (select rec.name as recipe, p.name as product_from_refr
+             from refregerator refr
+                      join product p on refr.product_id = p.id --взяли продукты только из холодильника
+                      join recipe_product rp on p.id = rp.product_id --взяли рецепты для этих продуктов
+                      join recipe rec on rp.recipe_id = rec.id --взяли имя рецепта
+             group by rec.name,-- чтобы рецепт показывался,
+                      p.name   -- если хотя бы 1 продукт найден ()
+             order by rec.name, p.name) rec_in_refr
+               right join
+           (select rec.name as recipe, p.name as product_full
+            from recipe_product rp
+                     join recipe rec on rp.recipe_id = rec.id -- взяли названия все рецептов
+                     join product p on rp.product_id = p.id -- взяли продукты для этих рецептов
+            order by rec.name, p.name) rec_full
+           on rec_in_refr.recipe = rec_full.recipe
+               and rec_in_refr.product_from_refr = rec_full.product_full)
+      group by rec_full.recipe) missed_pr
+where missed_num <= 3;
