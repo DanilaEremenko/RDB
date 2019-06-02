@@ -10,6 +10,8 @@
   "MAX_DAY_EXP": 700,
   "MIN_AM": 1,
   "MAX_AM": 5,
+  "MIN_WEIGHT":100,
+  "MAX_WEIGHT":1000,
   "MIN_ADD_AVAIL": 1,
   "MAX_ADD_AVAIL": 2000
 }

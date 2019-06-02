@@ -50,6 +50,7 @@ create table recipe
 (
     id                serial primary key,
     name              varchar(50) not null,
+    weight            integer     not null,
 
     way_of_cooking_id integer     not null,
     foreign key (way_of_cooking_id) references way_of_cooking (id)
