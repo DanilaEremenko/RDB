@@ -195,6 +195,7 @@ def add_into_table(cursor, rw, table_name, fields, min_av, max_av, bounds=None):
                     for i in range(MIN_B):
                         seq += get_random_word(rw, min_size=1, max_size=MAX_VCH_LEN) + " "
                     request += "\'%s\'," % seq[:seq.__len__() - 1]
+                    bi += 1
 
                 elif partype == PREF:
                     (min_id, max_id, lines) = get_table_turp(field)
@@ -370,7 +371,8 @@ if __name__ == '__main__':
         elif ti == 4:
             add_into_table(
                 cursor, rw, table_name="recipe_product",
-                fields={'id': PID, 'recipe': PREF, 'product': PREF},
+                fields={'id': PID, 'recipe': PREF, 'product': PREF, 'product_amount' : PINT },
+                bounds=[(MIN_AM, MAX_AM)],
                 min_av=MIN_ADD_AVAIL,
                 max_av=MAX_ADD_AVAIL
             )
@@ -382,7 +384,6 @@ if __name__ == '__main__':
     # -------------------------- commit or not commit changes ---------------------------
     commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
     if commit_allowed:
-        run_sql("../lab2/upd_rec_prod_num.sql")
         conn.commit()
     cursor.close()
     conn.close()

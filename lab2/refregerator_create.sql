@@ -60,13 +60,14 @@ create table recipe
 /*------------------------------ many-to-many linking table ------------------------------*/
 create table recipe_product
 (
-    id         serial primary key,
+    id             serial primary key,
 
-    recipe_id  integer not null,
+    recipe_id      integer not null,
     foreign key (recipe_id) references recipe (id),
 
-    product_id integer not null,
-    foreign key (product_id) references product (id)
+    product_id     integer not null,
+    foreign key (product_id) references product (id),
+    product_amount integer not null
 
 );
 
@@ -87,17 +88,6 @@ create table refregerator
     foreign key (market_name_id) references market_name (id)
 );
 
-/*----------------------------------- number of products for recipe ----------------*/
-create table recipe_product_num
-(
-
-    recipe_id   integer not null,
-    foreign key (recipe_id) references recipe (id),
-
-    product_num integer not null
-
-
-);
 
 
 /*----------------------------- enum-tables initializing --------------------------------------*/
