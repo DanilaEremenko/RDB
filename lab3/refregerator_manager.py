@@ -22,6 +22,9 @@ MAX_DAY_EXP = 0
 MIN_AM = 0
 MAX_AM = 0
 
+MIN_WEIGHT = 0
+MAX_WEIGHT = 0
+
 MIN_ADD_AVAIL = 0
 MAX_ADD_AVAIL = 0
 
@@ -195,6 +198,7 @@ def add_into_table(cursor, rw, table_name, fields, min_av, max_av, bounds=None):
                     for i in range(MIN_B):
                         seq += get_random_word(rw, min_size=1, max_size=MAX_VCH_LEN) + " "
                     request += "\'%s\'," % seq[:seq.__len__() - 1]
+                    bi += 1
 
                 elif partype == PREF:
                     (min_id, max_id, lines) = get_table_turp(field)
@@ -276,6 +280,7 @@ def parse_json(path):
         MIN_DPRICE, MAX_DPRICE, \
         MIN_DAY_EXP, MAX_DAY_EXP, \
         MIN_AM, MAX_AM, \
+        MIN_WEIGHT, MAX_WEIGHT, \
         MIN_ADD_AVAIL, MAX_ADD_AVAIL
 
     MAX_VCH_LEN = params_dict.__getitem__('MAX_VCH_LEN')
@@ -294,6 +299,9 @@ def parse_json(path):
 
     MIN_AM = params_dict.__getitem__('MIN_AM')
     MAX_AM = params_dict.__getitem__('MAX_AM')
+
+    MIN_WEIGHT = params_dict.__getitem__('MIN_WEIGHT')
+    MAX_WEIGHT = params_dict.__getitem__('MAX_WEIGHT')
 
     MIN_ADD_AVAIL = params_dict.__getitem__('MIN_ADD_AVAIL')
     MAX_ADD_AVAIL = params_dict.__getitem__('MAX_ADD_AVAIL')
@@ -360,8 +368,8 @@ if __name__ == '__main__':
         elif ti == 3:
             add_into_table(
                 cursor, rw, table_name="recipe",
-                fields={'id': PID, 'name': PSEQ, 'way_of_cooking': PREF},
-                bounds=[(2, 3)],
+                fields={'id': PID, 'name': PSEQ, 'weight':PINT, 'way_of_cooking': PREF},
+                bounds=[(2, 3),(MIN_WEIGHT, MAX_WEIGHT)],
                 min_av=MIN_ADD_AVAIL,
                 max_av=MAX_ADD_AVAIL
             )
@@ -370,7 +378,8 @@ if __name__ == '__main__':
         elif ti == 4:
             add_into_table(
                 cursor, rw, table_name="recipe_product",
-                fields={'id': PID, 'recipe': PREF, 'product': PREF},
+                fields={'id': PID, 'recipe': PREF, 'product': PREF, 'product_amount' : PINT },
+                bounds=[(MIN_AM, MAX_AM)],
                 min_av=MIN_ADD_AVAIL,
                 max_av=MAX_ADD_AVAIL
             )
@@ -382,7 +391,6 @@ if __name__ == '__main__':
     # -------------------------- commit or not commit changes ---------------------------
     commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
     if commit_allowed:
-        run_sql("../lab2/upd_rec_prod_num.sql")
         conn.commit()
     cursor.close()
     conn.close()
