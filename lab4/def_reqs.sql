@@ -146,7 +146,7 @@ where id = (select max(id) from recipe_product);
 
 ------------------------------------------------------------------------------
 /*1.Вывести порядок приготовления блюда и ингридиенты*/
-select r.name recipe, wc.name how_to_cook, p.name products
+select r.name recipe, wc.name how_to_cook, p.name products,product_amount
 from recipe_product rp
          join recipe r on rp.recipe_id = r.id
          join way_of_cooking wc on r.way_of_cooking_id = wc.id
