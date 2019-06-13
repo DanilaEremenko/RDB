@@ -123,63 +123,52 @@ def generate(cursor):
         # define tables, which will be filled
         ti = choose_variant_from_dict(
             "CHOOSE TABLE",
-            {0: 'client', 1: 'refregerator', 2: 'product', 3: 'recipe', 4: 'recipe_product', 5: 'exit'}
+            {0: 'client_refrigerator', 1: 'market_refrigerator', 2: 'food', 3: 'exit'}
         )
 
-        # ------------------- change table : refregerator -------------------------------------
+        # ------------------- change table : client_refrigerator -------------------------------------
         if ti == 0:
-            add_into_table(
-                cursor, table_name="client",
-                fields={'id': PID, 'first_name': PNAME, 'second_name': PNAME, 'account': PINT},
-                bounds=[(1, MAX_VCH_LEN), (1, MAX_VCH_LEN), (MIN_ACCOUNT, MAX_ACCOUNT)],
-                min_av=MIN_ADD_AVAIL,
-                max_av=MAX_ADD_AVAIL
-            )
+            add_into_table \
+                    (
+                    cursor, table_name="client_refrigerator",
+                    fields={'id': PID, 'client': PREF, 'food': PREF, 'market': PREF,
+                            'price': PINT, 'disc_price': PINT, 'buying_date': PDATE,
+                            'day_before_expiring': PINT, 'amount': PINT},
 
-        # ------------------- change table : refregerator -------------------------------------
-        if ti == 1:
+                    bounds=[(MIN_PRICE, MAX_PRICE), (MIN_DPRICE, MAX_DPRICE), (MIN_DAY_EXP, MAX_DAY_EXP),
+                            (MIN_AM, MAX_AM)],
+
+                    min_av=MIN_ADD_AVAIL,
+                    max_av=MAX_ADD_AVAIL
+                )
+
+        # --------------- change table : market_refrigerator ----------------------
+        elif ti == 1:
             add_into_table(
-                cursor, table_name="refregerator",
-                fields={'id': PID, 'product': PREF, 'market_name': PREF, 'price': PINT, 'disc_price': PINT,
-                        'buying_date': PDATE,
+                cursor, table_name="market_refrigerator",
+                fields={'id': PID, 'market': PREF, 'food': PREF,
+                        'price': PINT, 'disc_price': PINT,
                         'day_before_expiring': PINT, 'amount': PINT},
-                bounds=[(MIN_PRICE, MAX_PRICE), (MIN_DPRICE, MAX_DPRICE), (MIN_DAY_EXP, MAX_DAY_EXP), (MIN_AM, MAX_AM)],
+
+                bounds=[(MIN_PRICE, MAX_PRICE), (MIN_DPRICE, MAX_DPRICE), (MIN_DAY_EXP, MAX_DAY_EXP),
+                        (MIN_AM, MAX_AM)],
+
                 min_av=MIN_ADD_AVAIL,
                 max_av=MAX_ADD_AVAIL
             )
 
-        # --------------- change tables : product & way_of cooking product ----------------------
+        # --------------- change table : food ----------------------
         elif ti == 2:
             add_into_table(
-                cursor, table_name="product",
-                fields={'id': PID, 'name': PSTR, 'mark': PSTR, 'priority': PINT, 'cook_condition': PREF,
-                        'product_type': PREF},
-                bounds=[(1, MAX_VCH_LEN), (1, MAX_VCH_LEN), (MIN_PRIOR, MAX_PRIOR)],
-                min_av=MIN_ADD_AVAIL,
-                max_av=MAX_ADD_AVAIL
-            )
-
-        # --------------- change table : recipe ----------------------
-        elif ti == 3:
-            add_into_table(
                 cursor, table_name="recipe",
-                fields={'id': PID, 'name': PSEQ, 'weight': PINT, 'way_of_cooking': PREF},
-                bounds=[(2, 3), (MIN_WEIGHT, MAX_WEIGHT)],
-                min_av=MIN_ADD_AVAIL,
-                max_av=MAX_ADD_AVAIL
-            )
+                fields={'id': PID, 'name': PSEQ, 'food_type': PREF},
 
-        # --------------- change table : recipe_product ---------------
-        elif ti == 4:
-            add_into_table(
-                cursor, table_name="recipe_product",
-                fields={'id': PID, 'recipe': PREF, 'product': PREF, 'product_amount': PINT},
-                bounds=[(MIN_AM, MAX_AM)],
+                bounds=[(2, 3)],
+
                 min_av=MIN_ADD_AVAIL,
                 max_av=MAX_ADD_AVAIL
             )
 
         # ------------------------------ exit from program ------------------------------
-        elif ti == 5:
+        elif ti == 3:
             fill_complete = True
-
