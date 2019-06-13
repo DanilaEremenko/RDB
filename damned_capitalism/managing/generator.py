@@ -30,7 +30,7 @@ MAX_ADD_AVAIL = 0
 
 
 # ------------------------------ PARSING METHODS ----------------------------
-def store_json(path):
+def store_generator_params_to_json(path):
     """
     Store dictionary with params to the file by the path.
     :param path:
@@ -64,7 +64,7 @@ def store_json(path):
     pass
 
 
-def parse_json(path):
+def init_generator_params_from_json(path):
     """
     Load params from json file by path. Json file must contain dictionary.
     :param path:
