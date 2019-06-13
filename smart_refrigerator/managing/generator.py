@@ -1,5 +1,3 @@
-import psycopg2
-import sys
 from db_generator import *
 import json
 
@@ -23,6 +21,9 @@ MAX_AM = 0
 
 MIN_WEIGHT = 0
 MAX_WEIGHT = 0
+
+MIN_ACCOUNT = 0
+MAX_ACCOUNT = 0
 
 MIN_ADD_AVAIL = 0
 MAX_ADD_AVAIL = 0
@@ -51,6 +52,9 @@ def store_json(path):
                    'MIN_AM': 1,
                    'MAX_AM': 5,
 
+                   'MIN_ACCOUNT': 20_000,
+                   'MAX_ACCOUNT': 60_000,
+
                    'MIN_ADD_AVAIL': 1,
                    'MAX_ADD_AVAIL': 2000
                    }
@@ -76,6 +80,7 @@ def parse_json(path):
         MIN_DAY_EXP, MAX_DAY_EXP, \
         MIN_AM, MAX_AM, \
         MIN_WEIGHT, MAX_WEIGHT, \
+        MIN_ACCOUNT, MAX_ACCOUNT, \
         MIN_ADD_AVAIL, MAX_ADD_AVAIL
 
     MAX_VCH_LEN = params_dict.__getitem__('MAX_VCH_LEN')
@@ -98,6 +103,9 @@ def parse_json(path):
     MIN_WEIGHT = params_dict.__getitem__('MIN_WEIGHT')
     MAX_WEIGHT = params_dict.__getitem__('MAX_WEIGHT')
 
+    MIN_ACCOUNT = params_dict.__getitem__('MIN_ACCOUNT')
+    MAX_ACCOUNT = params_dict.__getitem__('MAX_ACCOUNT')
+
     MIN_ADD_AVAIL = params_dict.__getitem__('MIN_ADD_AVAIL')
     MAX_ADD_AVAIL = params_dict.__getitem__('MAX_ADD_AVAIL')
 
@@ -107,25 +115,7 @@ def parse_json(path):
 
 
 # ------------------------------------------------------------------------------------------
-if __name__ == '__main__':
-    if sys.argv.__len__() != 2:
-        raise ValueError("Illegal amount of arguments = %d "
-                         "(path to json config file must be passed)" % sys.argv.__len__())
-
-    print("-------------------------------")
-    param_path = sys.argv[1]
-    # store_json(param_path)
-    parse_json(param_path)
-    print("-------------------------------")
-
-    login = "refregerator_manager"
-    password = input("Input password for role \'%s\'" % login)
-    print("-------------------------------")
-
-    conn = psycopg2.connect(dbname='refregerator', user=login, password=password, host='localhost')
-    cursor = conn.cursor()
-    rw = RandomWords()
-
+def generate(cursor):
     fill_complete = False
     while not fill_complete:
 
@@ -133,8 +123,18 @@ if __name__ == '__main__':
         # define tables, which will be filled
         ti = choose_variant_from_dict(
             "CHOOSE TABLE",
-            {1: 'refregerator', 2: 'product', 3: 'recipe', 4: 'recipe_product', 5: 'exit'}
+            {0: 'client', 1: 'refregerator', 2: 'product', 3: 'recipe', 4: 'recipe_product', 5: 'exit'}
         )
+
+        # ------------------- change table : refregerator -------------------------------------
+        if ti == 0:
+            add_into_table(
+                cursor, table_name="client",
+                fields={'id': PID, 'first_name': PNAME, 'second_name': PNAME, 'account': PINT},
+                bounds=[(1, MAX_VCH_LEN), (1, MAX_VCH_LEN), (MIN_ACCOUNT, MAX_ACCOUNT)],
+                min_av=MIN_ADD_AVAIL,
+                max_av=MAX_ADD_AVAIL
+            )
 
         # ------------------- change table : refregerator -------------------------------------
         if ti == 1:
@@ -183,9 +183,3 @@ if __name__ == '__main__':
         elif ti == 5:
             fill_complete = True
 
-    # -------------------------- commit or not commit changes ---------------------------
-    commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
-    if commit_allowed:
-        conn.commit()
-    cursor.close()
-    conn.close()

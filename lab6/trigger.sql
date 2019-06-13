@@ -75,6 +75,7 @@ execute procedure fix_buying_date();
 /*
 Проверять дубли при добавлении продуктов в рецепт. При дублировании выбрасывать исключение.
 */
+
 drop function if exists check_repeat_in_recipe_product() cascade;
 create function check_repeat_in_recipe_product() returns trigger
 as
@@ -91,7 +92,7 @@ $$ language plpgsql;
 create trigger check_repeat_in_recipe_product_trig
     before insert or update
     on recipe_product
-    for each row    
+    for each row
 execute procedure check_repeat_in_recipe_product();
 
 
