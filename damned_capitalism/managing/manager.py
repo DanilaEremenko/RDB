@@ -3,16 +3,48 @@ import os
 
 sys.path.append("%s/../../lab3" % os.getcwd())
 
-from db_generator import choose_variant_from_dict
+from db_generator import choose_variant_from_dict, get_input_int
 import generator as m_gnr
 import statistic as m_stat
 import intializer as m_init
 
 import psycopg2
+import json
+
+days_passed = 0
+game_started = 0
+min_days_passed = 0
+max_days_passed = 0
 
 
 def pretty_print(phrase):
     print("\n-------------- %s ---------\n" % phrase)
+
+
+def parse_game_condition(path):
+    global days_passed, game_started, min_days_passed, max_days_passed
+
+    params_dict = json.load(open(path, 'r'))
+    days_passed = params_dict.__getitem__("days_passed")
+    game_started = params_dict.__getitem__("game_started")
+    min_days_passed = params_dict.__getitem__("min_days_passed")
+    max_days_passed = params_dict.__getitem__("max_days_passed")
+    pass
+
+
+def store_game_condition(path):
+    params_dict = {'days_passed': days_passed,
+                   'game_started': game_started,
+                   'min_days_passed': min_days_passed,
+                   'max_days_passed': max_days_passed}
+    with open(path, "w") as fp:
+        json.dump(params_dict, fp)
+
+
+def try_commit(conn):
+    commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
+    if commit_allowed:
+        conn.commit()
 
 
 if __name__ == '__main__':
@@ -21,6 +53,7 @@ if __name__ == '__main__':
 
     # --------------------------- initializing --------------------------------------
     pretty_print("initializing")
+    parse_game_condition("../cfg/world_cfg.json")
     m_gnr.init_generator_params_from_json("../cfg/generator_cfg.json")
 
     login = "manager"
@@ -29,7 +62,10 @@ if __name__ == '__main__':
     conn = psycopg2.connect(dbname='damned_capitalism', user=login, password=password, host='localhost')
     cursor = conn.cursor()
 
-    m_init.init_tables(cursor)
+    if not game_started:
+        game_started = 1
+        m_init.init_tables(cursor)
+        conn.commit()
 
     # ------------------------------- filling -----------------------------------------
     fill_complete = False
@@ -47,13 +83,7 @@ if __name__ == '__main__':
             if new_game:
                 # TODO
                 m_gnr.generate(cursor=cursor)
-                commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
-                if commit_allowed:
-                    conn.commit()
-                cursor.close()
-                conn.close()
-            else:
-                continue
+                try_commit(conn)
 
 
         # ------------------------ add data manually --------------------------------------
@@ -62,7 +92,10 @@ if __name__ == '__main__':
 
         # ------------------------ pass days  --------------------------------------
         elif ti == 2:
-            print("not available")
+            days_passed += get_input_int("How many days will pass?(%d - %d)" %
+                                         (min_days_passed, max_days_passed),
+                                         min=min_days_passed, max=max_days_passed)
+
 
         # ------------------------ check statistic --------------------------------------
         elif ti == 3:
@@ -73,5 +106,6 @@ if __name__ == '__main__':
             pretty_print("exiting")
             fill_complete = True
 
+    store_game_condition("../cfg/world_cfg.json")
     cursor.close()
     conn.close()

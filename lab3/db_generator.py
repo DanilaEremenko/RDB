@@ -54,7 +54,7 @@ def choose_variant_from_dict(title, variants):
     for n, name in variants.items(): variants_str += "%d:%s\n" % (n, name)
 
     while True:
-        answ = get_input_int(title="%s\n%s" % (title, variants_str))
+        answ = get_input_int(title="-------- %s ----------\n%s" % (title, variants_str))
 
         if variants.keys().__contains__(answ):
             return answ
