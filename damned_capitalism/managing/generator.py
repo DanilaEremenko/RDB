@@ -115,7 +115,7 @@ def init_generator_params_from_json(path):
 
 
 # ------------------------------------------------------------------------------------------
-def generate(cursor):
+def generate_manually(cursor):
     fill_complete = False
     while not fill_complete:
 
@@ -172,3 +172,53 @@ def generate(cursor):
         # ------------------------------ exit from program ------------------------------
         elif ti == 3:
             fill_complete = True
+
+
+def init_table_with_json(cursor, tab_name, json_path):
+    jdict = json.load(open(json_path, 'r'))
+    for id, atr_turp in jdict.items():
+        req = "insert into %s values (%s, " % (tab_name, id)
+
+        for atr in atr_turp:
+            req += "\'%s\'," % atr
+
+        req = req[:req.__len__() - 1] + ");"
+        # print(req)
+        cursor.execute(req)
+
+
+def generate_new_game(cursor):
+    # -------------------- clean tables ---------------------------------
+    for tab_name in ('market_refrigerator', 'client_refrigerator', 'client', 'market', 'food', 'food_type'):
+        cursor.execute("delete from %s * cascade;" % tab_name)
+
+    # -------------------- init tables from json -------------------------
+    for tab_name in ('client', 'market', 'food_type'):
+        init_table_with_json(cursor=cursor, tab_name=tab_name, json_path="../res/%ss.json" % tab_name)
+
+    # --------------- change table : food ----------------------
+    add_into_table(
+        cursor, table_name="food",
+        fields={'id': PID, 'name': PSEQ, 'food_type': PREF},
+
+        bounds=[(2, 3)],
+
+        min_av=MIN_ADD_AVAIL,
+        max_av=MAX_ADD_AVAIL,
+        lines_amount=2000
+    )
+
+    # --------------- change table : market_refrigerator ----------------------
+    add_into_table(
+        cursor, table_name="market_refrigerator",
+        fields={'id': PID, 'market': PREF, 'food': PREF,
+                'price': PINT, 'disc_price': PINT,
+                'day_before_expiring': PINT, 'amount': PINT},
+
+        bounds=[(MIN_PRICE, MAX_PRICE), (MIN_DPRICE, MAX_DPRICE), (MIN_DAY_EXP, MAX_DAY_EXP),
+                (MIN_AM, MAX_AM)],
+
+        min_av=MIN_ADD_AVAIL,
+        max_av=MAX_ADD_AVAIL,
+        lines_amount=2000
+    )

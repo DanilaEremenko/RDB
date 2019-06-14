@@ -1,7 +1,7 @@
 {
-  "1": "MISTER LOPATA",
-  "2": "MISHAR KOSINKA ",
-  "3": "SEMBA PROSTO",
-  "4": "OKAY",
-  "5": "LENTA"
+  "1": ["MISTER LOPATA",0],
+  "2": ["MISHAR KOSINKA ",0],
+  "3": ["SEMBA PROSTO",0],
+  "4": ["OKAY",0],
+  "5": ["LENTA",0]
 }

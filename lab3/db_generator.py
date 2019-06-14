@@ -137,7 +137,7 @@ def get_random_name(rn, min_size, max_size):
 
 
 # ------------------------------ MAIN METHOD FOR TABLES FILLING---------------------------
-def add_into_table(cursor, table_name, fields, min_av, max_av, bounds=None):
+def add_into_table(cursor, table_name, fields, min_av, max_av, bounds=None, lines_amount=None):
     """
     :param cursor: cursor to database
     :param table_name: name of fielded table
@@ -150,68 +150,63 @@ def add_into_table(cursor, table_name, fields, min_av, max_av, bounds=None):
     rw = RandomWords()
     rn = RandomNicknames()
 
-    way = choose_variant_from_dict("CHOOSE WAY OF ADDING FOR TABLE \'%s\'" % table_name, {1: 'random', 2: 'not random'})
+    if lines_amount == None:
+        lines_amount = get_input_int(title="HOW MANY?[%d - %d]" % (min_av, max_av), min=min_av, max=max_av)
 
-    if way == 1:
-        num = get_input_int(title="HOW MANY?[%d - %d]" % (min_av, max_av), min=min_av, max=max_av)
+    for i in range(0, lines_amount):
 
-        for i in range(0, num):
+        request = "insert into %s values(" % table_name
 
-            request = "insert into %s values(" % table_name
+        bi = 0
+        for field, partype in fields.items():
+            if partype == PINT:
+                MIN_B = bounds[bi][0]
+                MAX_B = bounds[bi][1]
+                request += "%d," % np.random.randint(MIN_B, MAX_B)
+                bi += 1
 
-            bi = 0
-            for field, partype in fields.items():
-                if partype == PINT:
-                    MIN_B = bounds[bi][0]
-                    MAX_B = bounds[bi][1]
-                    request += "%d," % np.random.randint(MIN_B, MAX_B)
-                    bi += 1
+            elif partype == PSTR:
+                MIN_B = bounds[bi][0]
+                MAX_B = bounds[bi][1]
+                word = get_random_word(rw, min_size=MIN_B, max_size=MAX_B)
+                request += "\'%s\'," % word
+                bi += 1
 
-                elif partype == PSTR:
-                    MIN_B = bounds[bi][0]
-                    MAX_B = bounds[bi][1]
-                    word = get_random_word(rw, min_size=MIN_B, max_size=MAX_B)
-                    request += "\'%s\'," % word
-                    bi += 1
+            elif partype == PSEQ:
+                MIN_B = bounds[bi][0]
+                MAX_B = bounds[bi][1]
+                seq = ""
+                for i in range(MIN_B):
+                    seq += get_random_word(rw, min_size=1, max_size=20) + " "
+                request += "\'%s\'," % seq[:seq.__len__() - 1]
+                bi += 1
 
-                elif partype == PSEQ:
-                    MIN_B = bounds[bi][0]
-                    MAX_B = bounds[bi][1]
-                    seq = ""
-                    for i in range(MIN_B):
-                        seq += get_random_word(rw, min_size=1, max_size=20) + " "
-                    request += "\'%s\'," % seq[:seq.__len__() - 1]
-                    bi += 1
+            elif partype == PREF:
+                (min_id, max_id, lines) = get_table_turp(cursor, field)
+                if min_id == 0 and max_id == 0:
+                    raise Exception("table = %s is empty" % field)
+                currid = np.random.randint(low=min_id, high=max_id)
+                request += "%d," % lines[currid][0]
 
-                elif partype == PREF:
-                    (min_id, max_id, lines) = get_table_turp(cursor, field)
-                    currid = np.random.randint(low=min_id, high=max_id)
-                    request += "%d," % lines[currid][0]
+            elif partype == PDATE:
+                request += "%s," % "current_date"
 
-                elif partype == PDATE:
-                    request += "%s," % "current_date"
+            elif partype == PID:
+                rid = get_free_id(cursor, table_name)
+                request += "%d," % rid
 
-                elif partype == PID:
-                    rid = get_free_id(cursor, table_name)
-                    request += "%d," % rid
+            elif partype == PNAME:
+                MIN_B = bounds[bi][0]
+                MAX_B = bounds[bi][1]
+                name = get_random_name(rn, min_size=MIN_B, max_size=MAX_B)
+                request += "\'%s\'," % name
+                bi += 1
 
-                elif partype == PNAME:
-                    MIN_B = bounds[bi][0]
-                    MAX_B = bounds[bi][1]
-                    name = get_random_name(rn, min_size=MIN_B, max_size=MAX_B)
-                    request += "\'%s\'," % name
-                    bi += 1
+        request = request[:request.__len__() - 1] + ")"
 
-            request = request[:request.__len__() - 1] + ")"
+        print(request)
+        cursor.execute(request)
 
-            print(request)
-            cursor.execute(request)
-
-
-
-
-    elif way == 2:
-        print("not random still isn't working")  # TODO add
     pass
 
 

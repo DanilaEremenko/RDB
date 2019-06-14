@@ -47,6 +47,7 @@ def try_commit(conn):
         conn.commit()
 
 
+# ----------------------- main ----------------------------------
 if __name__ == '__main__':
 
     pretty_print("damned_capitalism launched")
@@ -64,7 +65,7 @@ if __name__ == '__main__':
 
     if not game_started:
         game_started = 1
-        m_init.init_tables(cursor)
+        m_gnr.generate_new_game(cursor=cursor)
         conn.commit()
 
     # ------------------------------- filling -----------------------------------------
@@ -81,14 +82,14 @@ if __name__ == '__main__':
         if ti == 0:
             new_game = choose_variant_from_dict("ARE YOU SURE?", variants={0: 'no', 1: 'yes'})
             if new_game:
-                # TODO
-                m_gnr.generate(cursor=cursor)
+                days_passed = 0
+                m_gnr.generate_new_game(cursor=cursor)
                 try_commit(conn)
 
 
         # ------------------------ add data manually --------------------------------------
         elif ti == 1:
-            print("not available")
+            m_gnr.generate_manually(cursor=cursor)
 
         # ------------------------ pass days  --------------------------------------
         elif ti == 2:

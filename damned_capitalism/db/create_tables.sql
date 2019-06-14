@@ -2,7 +2,7 @@
 create table market
 (
   id     serial primary key,
-  name   varchar(15) not null unique,
+  name   varchar(100) not null unique,
   rating int         not null
 
 );
@@ -12,7 +12,7 @@ create table market
 create table food_type
 (
   id   serial primary key,
-  name varchar(15) not null unique
+  name varchar(100) not null unique
 );
 
 
@@ -20,7 +20,7 @@ create table food_type
 create table food
 (
   id           serial primary key,
-  name         varchar(15) not null,
+  name         varchar(100) not null,
   food_type_id integer     not null,
 
   foreign key (food_type_id) references food_type (id)
@@ -31,12 +31,12 @@ create table food
 create table client
 (
   id              serial primary key,
-  first_name      varchar(30) not null,
-  second_name     varchar(30) not null,
+  first_name      varchar(100) not null,
+  second_name     varchar(100) not null,
   account         integer     not null,
   salary          integer     not null,
-  employment      varchar(50),
-  education       varchar(50),
+  employment      varchar(100),
+  education       varchar(100),
   day_without_eat integer     not null
 
 );
