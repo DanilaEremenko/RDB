@@ -137,7 +137,7 @@ def get_random_name(rn, min_size, max_size):
 
 
 # ------------------------------ MAIN METHOD FOR TABLES FILLING---------------------------
-def add_into_table(cursor, table_name, fields, min_av, max_av, bounds=None, lines_amount=None):
+def add_into_table(cursor, table_name, fields, min_av=None, max_av=None, bounds=None, lines_amount=None, verbose=False):
     """
     :param cursor: cursor to database
     :param table_name: name of fielded table
@@ -151,8 +151,10 @@ def add_into_table(cursor, table_name, fields, min_av, max_av, bounds=None, line
     rn = RandomNicknames()
 
     if lines_amount == None:
+        if min_av == None or max_av == None: raise Exception("nor lines_amount or min_av & max_av passed")
         lines_amount = get_input_int(title="HOW MANY?[%d - %d]" % (min_av, max_av), min=min_av, max=max_av)
 
+    print("generate %d lines for table %s..." % (lines_amount, table_name))
     for i in range(0, lines_amount):
 
         request = "insert into %s values(" % table_name
@@ -204,7 +206,7 @@ def add_into_table(cursor, table_name, fields, min_av, max_av, bounds=None, line
 
         request = request[:request.__len__() - 1] + ")"
 
-        print(request)
+        if verbose: print(request)
         cursor.execute(request)
 
     pass

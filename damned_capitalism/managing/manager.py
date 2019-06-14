@@ -4,8 +4,9 @@ import os
 sys.path.append("%s/../../lab3" % os.getcwd())
 
 from db_generator import choose_variant_from_dict, get_input_int
-import generator as dc_gnr
-import statistic as dc_stat
+import generator as dcgen
+import statistic as dcstat
+import algorithms_runer as dcar
 
 import psycopg2
 import json
@@ -25,23 +26,17 @@ def parse_game_params(path):
     return max_time, account
 
 
-def try_commit(conn):
-    commit_allowed = choose_variant_from_dict(title="COMMIT CHANGES?", variants={0: 'no', 1: 'yes'})
-    if commit_allowed:
-        conn.commit()
-
-
 def store_json_for_current_game(cursor, path, account, max_time):
     cursor.execute("select id,price,value from item;")
-    items = np.array(cursor.fetchall()).transpose()
-    j_dict = {"ids": items[0],
-              "prices": items[1],
-              "values": items[2],
+    items = np.array(cursor.fetchall()).transpose().astype(int)
+    j_dict = {"ids": list(items[0]),
+              "prices": list(items[1]),
+              "values": list(items[2]),
               "account": account,
               "max_time": max_time}
 
     with open(path, "w") as fp:
-        json.dump(j_dict, fp)
+        json.dump(j_dict, fp, default=int)  # best bone in my life
 
     pass
 
@@ -53,7 +48,7 @@ if __name__ == '__main__':
 
     # --------------------------- initializing --------------------------------------
     pretty_print("initializing")
-    dc_gnr.init_generator_params_from_json("../cfg/generator_cfg.json")
+    dcgen.init_generator_params_from_json("../cfg/generator_cfg.json")
 
     db_name = 'damned_capitalism'
     login = "manager"
@@ -74,12 +69,15 @@ if __name__ == '__main__':
 
         # ------------------------ new game --------------------------------------
         if ti == 0:
-            dc_gnr.generate_new_game(cursor=cursor)
-            try_commit(conn)
+            dcgen.generate_new_game(cursor=cursor)
+            conn.commit()
             max_time, account = parse_game_params("../cfg/game_cfg.json")
             store_json_for_current_game(cursor=cursor,
-                                        path="../res/algorithms/items.json",
+                                        path="../algorithms/items.json",
                                         account=account, max_time=max_time)
+            dcar.run_all(cursor, "../cfg/game_algorithms.json", max_time=max_time)
+            conn.commit()
+            dcstat.show_results(cursor)
 
         if ti == 1:
             print("TODO show hall of fame")

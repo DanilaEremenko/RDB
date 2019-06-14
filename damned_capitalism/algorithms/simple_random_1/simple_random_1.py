@@ -4,11 +4,11 @@ import time
 import json
 
 
-def filling_algorithm(max_time, id, price, value, account):
+def filling_algorithm(max_time, ids, prices, values, account):
     s_time = time.time()
     # ---------------- calculate answer ---------------------------
     while (time.time() - s_time) < max_time:
-        answer = [0, 1, 2, 3]
+        answer = [1, 2, 3, 4]
 
     return answer
 
@@ -27,9 +27,17 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output_file", type=str,
                         help="your bank account")
 
-
     args = parser.parse_args()
 
-    array = json.load(open(args.input_file, 'r'))
+    game_dict = json.load(open(args.input_file, 'r'))
 
-    choosed_ids = filling_algorithm()
+    selected_ids = filling_algorithm(
+        max_time=game_dict.__getitem__("max_time"),
+        account=game_dict.__getitem__("account"),
+        ids=game_dict.__getitem__("ids"),
+        prices=game_dict.__getitem__("prices"),
+        values=game_dict.__getitem__("values")
+    )
+
+    with open(args.output_file, "w") as fp:
+        json.dump(selected_ids, fp)

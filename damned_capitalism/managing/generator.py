@@ -1,6 +1,7 @@
 from db_generator import *
 import json
 
+
 # ------------------------ parameters for generation -----------------------------------
 MIN_PRICE = 0
 MAX_PRICE = 0
@@ -63,12 +64,8 @@ def init_table_with_json(cursor, tab_name, json_path):
 
 def generate_new_game(cursor):
     # -------------------- clean tables ---------------------------------
-    for tab_name in ('client_item', 'item', 'person'):
+    for tab_name in ('person_item', 'item', 'person'):
         cursor.execute("delete from %s * cascade;" % tab_name)
-
-    # -------------------- init persons -------------------------
-    for tab_name in ('person',):
-        init_table_with_json(cursor=cursor, tab_name=tab_name, json_path="../res/%ss.json" % tab_name)
 
     # --------------- generate items ----------------------
     add_into_table(
