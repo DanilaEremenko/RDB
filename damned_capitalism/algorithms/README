@@ -1,13 +1,7 @@
-1.  interface:
-        1)directory that include:
-           -configuration.json
-           -source files of your algorithm
-        2)input of your algorithms:
-           -t : time for calculation
-           -d : database name
-           -u : user login
-           -p : password
-
-        3)output of your algorithms:
-            answer.json file which contains indexes of items
-2.  check simple_random dir as an example
+interface:
+     1. -i: option for input file in your solver
+     2. -o: option for output file in your solver
+     3. examples of your solver - algorithms/simple_random, algorithms/slow_johny
+     4. example of input file   - algorithms/items_ex.json
+     5. example of answer       - algorithms/simple_random/answer_ex.json
+     6.

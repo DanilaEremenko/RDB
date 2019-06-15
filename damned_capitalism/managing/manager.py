@@ -3,7 +3,7 @@ import os
 
 sys.path.append("%s/../../lab3" % os.getcwd())
 
-from db_generator import choose_variant_from_dict, get_input_int
+from db_generator import choose_variant_from_dict, get_input_int, get_input_str, get_input_int_from_tupl
 import generator as dcgen
 import statistic as dcstat
 import algorithms_runer as dcar
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         # --------------------------- configurating --------------------------------------
         ti = choose_variant_from_dict(
             "AVAILABLE ACTIONS:",
-            {0: 'new game', 1: 'show hall of fame', 9: 'exit'}
+            {0: 'new game', 1: 'store parties into file', 9: 'exit'}
         )
 
         # ------------------------ new game --------------------------------------
@@ -99,11 +99,25 @@ if __name__ == '__main__':
                                         path="../algorithms/items.json",
                                         account=account, max_time=max_time)
             dcar.run_all(cursor, "../cfg/game_algorithms.json", max_time=max_time)
+            dcstat.store_res_in_party(cursor, account, max_time)
             conn.commit()
-            dcstat.show_results(cursor)
-
+        #------------------------- store result party to file -------------------
         if ti == 1:
-            print("TODO show hall of fame")
+
+            pa_save = choose_variant_from_dict(
+                "AVAILABLE ACTIONS:",
+                {0: 'save all parties', 1: 'save one party'}
+            )
+            if pa_save==0:
+                dcstat.store_all_parties(cursor,"all_parties.txt")
+
+            elif pa_save==1:
+                name = get_input_str("name_of_file:", min_size=5, max_size=30)
+                cursor.execute("select distinct party_id from party order by party_id;")
+                party_ids = cursor.fetchall()
+                party_ids = list(np.array(party_ids).reshape(party_ids.__len__(), ))
+                party_id = get_input_int_from_tupl(arr=party_ids, title="CHOOSE PARTY_ID\n")
+                dcstat.store_party_in_file(cursor, name, party_id)
 
         # ------------------------ exiting --------------------------------------
         elif ti == 9:

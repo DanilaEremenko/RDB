@@ -32,6 +32,22 @@ def get_input_int(title=None, min=None, max=None):
             print("%s not an integer\n" % res)
 
 
+def get_input_int_from_tupl(arr, title=None, ):
+    while True:
+        if title != None:
+            print(title)
+        print(arr)
+        res = input()
+        if res.isdigit():
+            res = int(res)
+            if arr.__contains__(res):
+                return res
+            else:
+                print("no party_id = %d" % res)
+        else:
+            print("%s not an integer\n" % res)
+
+
 def get_input_str(title=None, min_size=1, max_size=15):
     while True:
         if title != None:
