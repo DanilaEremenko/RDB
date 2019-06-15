@@ -4,7 +4,5 @@
   "MAX_PRICE": 100000,
   "MIN_VALUE": 1,
   "MAX_VALUE": 100,
-  "MIN_WEIGHT": 100,
-  "MAX_WEIGHT": 1000,
   "ITEM_AMOUNT": 5
 }

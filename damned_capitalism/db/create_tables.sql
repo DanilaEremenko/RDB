@@ -12,8 +12,7 @@ create table person
 (
     id          serial primary key,
     first_name  varchar(100) not null,
-    second_name varchar(100) not null,
-    account     integer      not null
+    second_name varchar(100) not null
 );
 -----------------------------------------------------------
 create table person_item

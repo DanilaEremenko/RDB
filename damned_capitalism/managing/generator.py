@@ -8,9 +8,6 @@ MAX_PRICE = 0
 MIN_VALUE = 0
 MAX_VALUE = 0
 
-MIN_WEIGHT = 0
-MAX_WEIGHT = 0
-
 MAX_VCH_LEN = 0
 ITEM_AMOUNT = 0
 
@@ -28,7 +25,6 @@ def init_generator_params_from_json(path):
 
     global MIN_PRICE, MAX_PRICE, \
         MIN_VALUE, MAX_VALUE, \
-        MIN_WEIGHT, MAX_WEIGHT, \
         MAX_VCH_LEN, ITEM_AMOUNT
 
     MIN_PRICE = params_dict.__getitem__('MIN_PRICE')
@@ -36,9 +32,6 @@ def init_generator_params_from_json(path):
 
     MIN_VALUE = params_dict.__getitem__('MIN_VALUE')
     MAX_VALUE = params_dict.__getitem__('MAX_VALUE')
-
-    MIN_WEIGHT = params_dict.__getitem__('MIN_WEIGHT')
-    MAX_WEIGHT = params_dict.__getitem__('MAX_WEIGHT')
 
     MAX_VCH_LEN = params_dict.__getitem__('MAX_VCH_LEN')
     ITEM_AMOUNT = params_dict.__getitem__('ITEM_AMOUNT')
