@@ -47,7 +47,7 @@ def run_all(cursor, path_to_galg, max_time):
         alg_dir = "../algorithms/" + alg_dir
 
         fname, sname, interp, exec = parse_cfg_of_alg(alg_dir)
-        cursor.execute("insert into person values(%d, '%s', '%s', 1000);" % (person_id, fname, sname))
+        cursor.execute("insert into person values(%d, '%s', '%s');" % (person_id, fname, sname))
 
         run_script(alg_dir, interp, exec, max_time=max_time)
 
