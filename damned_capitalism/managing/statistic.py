@@ -1,9 +1,10 @@
 from db_generator import choose_variant_from_dict
+import os
 
 
 def show_results(cursor):
-    cursor.execute("select * from order_by_score();")
-    result = cursor.fetchall()
-    print("fname\t\t\tsname\t\t\t\t\tscore")
-    for fname, sname, score in result:
-        print("%s\t\t\t%s\t\t\t%d" % (fname, sname, score))
+    abs_respath = os.path.abspath("../algorithms")
+
+    cursor.execute("copy (select * from get_ordered_result()) to '%s/%s';" % (abs_respath, "result.txt"))
+
+    cursor.execute("copy (select * from get_item_person()) to '%s/%s';" % (abs_respath, "result_full.txt"))

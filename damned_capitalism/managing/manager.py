@@ -26,6 +26,23 @@ def parse_game_params(path):
     return max_time, account
 
 
+def delete_out_files():
+    alg_dir = "../algorithms"
+    os.system("rm -f %s/items.json" % alg_dir)
+    for alg in os.listdir(alg_dir):
+        os.system("rm -f %s/%s/answer.json" % (alg_dir, alg))
+
+
+def init_stored_procedures(cursor):
+    st_proc_dir = "../db/stored_procedures"
+    for sql_file in os.listdir(st_proc_dir):
+        req = ""
+        for line in open("%s/%s" % (st_proc_dir, sql_file)).readlines():
+            req += line
+        print("init %s/%s" % (st_proc_dir, sql_file))
+        cursor.execute(req)
+
+
 def store_json_for_current_game(cursor, path, account, max_time):
     cursor.execute("select id,price,value from item;")
     items = np.array(cursor.fetchall()).transpose().astype(int)
@@ -47,15 +64,21 @@ if __name__ == '__main__':
     pretty_print("damned_capitalism launched")
 
     # --------------------------- initializing --------------------------------------
-    pretty_print("initializing")
+    pretty_print("initializing of data generator")
     dcgen.init_generator_params_from_json("../cfg/generator_cfg.json")
 
+    pretty_print("db connecting")
     db_name = 'damned_capitalism'
     login = "manager"
     password = '1234'
 
     conn = psycopg2.connect(dbname=db_name, user=login, password=password, host='localhost')
     cursor = conn.cursor()
+
+    pretty_print("initializing of stored procedures ")
+    init_stored_procedures(cursor)
+
+    conn.commit()
 
     # ------------------------------- filling -----------------------------------------
     fill_complete = False
@@ -85,6 +108,7 @@ if __name__ == '__main__':
         # ------------------------ exiting --------------------------------------
         elif ti == 9:
             pretty_print("exiting")
+            delete_out_files()
             fill_complete = True
 
     cursor.close()

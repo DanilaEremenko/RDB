@@ -1,7 +1,6 @@
 from db_generator import *
 import json
 
-
 # ------------------------ parameters for generation -----------------------------------
 MIN_PRICE = 0
 MAX_PRICE = 0
@@ -76,3 +75,5 @@ def generate_new_game(cursor):
 
         lines_amount=ITEM_AMOUNT
     )
+
+    cursor.execute("insert into item values (0,'no answer.json',0,-1);")

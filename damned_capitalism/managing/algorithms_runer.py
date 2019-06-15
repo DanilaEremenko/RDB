@@ -1,20 +1,24 @@
 import json
-import os
 import time
+import subprocess
+import os
 
 
 def run_script(alg_dir, interp, exec, max_time):
     cmd_run = "%s %s/%s -i ../algorithms/items.json -o %s/answer.json" % \
               (interp, alg_dir, exec, alg_dir,)
-    print("run \n%s\n" % cmd_run)
+    print("%s" % cmd_run)
 
     start_time = time.time()
-    os.system(cmd_run)
+
+    os.system("rm -f %s/answer.json" % alg_dir)
+    p = subprocess.Popen(cmd_run, stdout=subprocess.PIPE, shell=True)
+    time.sleep(max_time + 0.3)
+    p.kill()
+
     exec_time = time.time() - start_time
 
-    if exec_time > max_time + 0.5:
-        with open(alg_dir + "/answer.json", "w") as fp:
-            json.dump([], fp)
+    print("%s times = %d" % (alg_dir, exec_time))
 
 
 def parse_cfg_of_alg(path_to_cfg):
@@ -24,10 +28,16 @@ def parse_cfg_of_alg(path_to_cfg):
 
 
 def insert_result_to_db(cursor, alg_dir, person_id):
-    it_ids = json.load(open(alg_dir + "/answer.json", 'r'))
-    req = "insert into person_item values (default, %d, " % person_id
-    for it_id in it_ids:
-        cursor.execute(req + "%d);" % it_id)
+    answer_path = alg_dir + "/answer.json"
+    no_answer_id = 0
+    if os.path.exists(answer_path):
+        it_ids = json.load(open(answer_path, 'r'))
+        req = "insert into person_item values (default, %d, " % person_id
+        for it_id in it_ids:
+            cursor.execute(req + "%d);" % it_id)
+        os.system("rm %s" % answer_path)
+    else:
+        cursor.execute("insert into person_item values (default ,%d,%d)" % (person_id, no_answer_id))
 
 
 def run_all(cursor, path_to_galg, max_time):

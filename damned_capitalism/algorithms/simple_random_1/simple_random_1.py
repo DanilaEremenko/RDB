@@ -5,10 +5,8 @@ import json
 
 
 def filling_algorithm(max_time, ids, prices, values, account):
-    s_time = time.time()
-    # ---------------- calculate answer ---------------------------
-    while (time.time() - s_time) < max_time:
-        answer = [1, 2, 3, 4]
+    time.sleep(max_time)
+    answer = [1, 2, 3, 4]
 
     return answer
 
