@@ -7,7 +7,6 @@ drop table recipe cascade;
 drop table product cascade;
 drop table refregerator cascade;
 drop table recipe_product cascade;
-drop table recipe_product_num cascade;
 
 revoke all on database refregerator from refregerator_manager;
 drop role refregerator_manager;

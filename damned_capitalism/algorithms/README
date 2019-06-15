@@ -1,0 +1,7 @@
+interface:
+     1. -i: option for input file in your solver
+     2. -o: option for output file in your solver
+     3. examples of your solver - algorithms/simple_random, algorithms/slow_johny
+     4. example of input file   - algorithms/items_ex.json
+     5. example of answer       - algorithms/simple_random/answer_ex.json
+     6.
