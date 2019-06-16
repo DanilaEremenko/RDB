@@ -54,6 +54,6 @@ if __name__ == '__main__':
         time_start=time.time()
     )
 
-    answer = {"ids": selected_ids, "ids.size": selected_ids.__len__(), "last_id": last_id}
+    answer = {"ids": selected_ids, "ids_size": selected_ids.__len__(), "last_id": last_id}
     with open(args.output_file, "w") as fp:
         json.dump(answer, fp)
