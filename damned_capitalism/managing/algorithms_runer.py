@@ -33,7 +33,7 @@ def insert_result_to_db(cursor, alg_dir, person_id):
     answer_path = os.path.abspath(alg_dir + "/answer.json")
     no_answer_id = 0
     if os.path.exists(answer_path):
-        it_ids = json.load(open(answer_path, 'r'))
+        it_ids = json.load(open(answer_path, 'r')).__getitem__("ids")
         req = "insert into person_item values (default, %d, " % person_id
         for it_id in it_ids:
             cursor.execute(req + "%d);" % it_id)
