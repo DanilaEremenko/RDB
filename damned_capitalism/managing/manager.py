@@ -28,7 +28,7 @@ def parse_game_params(path):
 
 def delete_out_files():
     alg_dir = "../algorithms"
-    #os.system("rm -f %s/items.json" % alg_dir)
+    os.system("rm -f %s/items.json" % alg_dir)
     for alg in os.listdir(alg_dir):
         os.system("rm -f %s/%s/answer.json" % (alg_dir, alg))
 
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
             pa_save = choose_variant_from_dict(
                 "AVAILABLE ACTIONS:",
-                {0: 'save all parties', 1: 'save one party'}
+                {0: 'save all parties', 1: 'save one party', 2: 'save last party'}
             )
             if pa_save == 0:
                 dcstat.store_all_parties(cursor, "all_parties.txt")
@@ -118,11 +118,13 @@ if __name__ == '__main__':
                 party_ids = list(np.array(party_ids).reshape(party_ids.__len__(), ))
                 party_id = get_input_int_from_tupl(arr=party_ids, title="CHOOSE PARTY_ID\n")
                 dcstat.store_party_in_file(cursor, name, party_id)
+            elif pa_save == 2:
+                dcstat.store_last_party(cursor, "last_party.txt")
 
         # ------------------------ exiting --------------------------------------
         elif ti == 9:
             pretty_print("exiting")
-            delete_out_files()
+            # delete_out_files()
             fill_complete = True
 
     cursor.close()
