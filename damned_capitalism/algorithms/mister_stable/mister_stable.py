@@ -36,6 +36,6 @@ if __name__ == '__main__':
         prices=game_dict.__getitem__("prices"),
         values=game_dict.__getitem__("values")
     )
-
+    answer = {"ids":selected_ids}
     with open(args.output_file, "w") as fp:
-        json.dump(selected_ids, fp)
+        json.dump(answer, fp)

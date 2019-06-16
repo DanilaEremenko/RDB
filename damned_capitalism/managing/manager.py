@@ -28,7 +28,7 @@ def parse_game_params(path):
 
 def delete_out_files():
     alg_dir = "../algorithms"
-    os.system("rm -f %s/items.json" % alg_dir)
+    #os.system("rm -f %s/items.json" % alg_dir)
     for alg in os.listdir(alg_dir):
         os.system("rm -f %s/%s/answer.json" % (alg_dir, alg))
 
@@ -44,7 +44,7 @@ def init_stored_procedures(cursor):
 
 
 def store_json_for_current_game(cursor, path, account, max_time):
-    cursor.execute("select id,price,value from item;")
+    cursor.execute("select id,price,value from item order by id;")
     items = np.array(cursor.fetchall()).transpose().astype(int)
     j_dict = {"ids": list(items[0]),
               "prices": list(items[1]),
@@ -101,17 +101,17 @@ if __name__ == '__main__':
             dcar.run_all(cursor, "../cfg/game_algorithms.json", max_time=max_time)
             dcstat.store_res_in_party(cursor, account, max_time)
             conn.commit()
-        #------------------------- store result party to file -------------------
+        # ------------------------- store result party to file -------------------
         if ti == 1:
 
             pa_save = choose_variant_from_dict(
                 "AVAILABLE ACTIONS:",
                 {0: 'save all parties', 1: 'save one party'}
             )
-            if pa_save==0:
-                dcstat.store_all_parties(cursor,"all_parties.txt")
+            if pa_save == 0:
+                dcstat.store_all_parties(cursor, "all_parties.txt")
 
-            elif pa_save==1:
+            elif pa_save == 1:
                 name = get_input_str("name_of_file:", min_size=5, max_size=30)
                 cursor.execute("select distinct party_id from party order by party_id;")
                 party_ids = cursor.fetchall()
