@@ -26,6 +26,15 @@ def store_all_parties(cursor, file_name):
     cursor.execute("copy (select * from party order by party_id, score) to '%s/%s';" % (abs_dir, file_name))
 
 
+def store_last_party(cursor,file_name):
+    abs_dir = os.path.abspath("../algorithms")
+    abs_file = "%s/%s" % (abs_dir, file_name)
+    os.system("touch %s" % abs_file)
+    os.system("chmod 666 %s" % abs_file)
+
+    cursor.execute("copy (select * from party where party_id = (select max(party_id) from party) order by score desc) to '%s/%s';" % (abs_dir, file_name))
+
+
 def store_party_in_file(cursor, file_name, p_id):
     abs_dir = os.path.abspath("../algorithms")
     abs_file = "%s/%s" % (abs_dir, file_name)
