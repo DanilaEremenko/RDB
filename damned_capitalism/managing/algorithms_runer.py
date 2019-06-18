@@ -37,7 +37,7 @@ def insert_result_to_db(cursor, alg_dir, person_id):
         req = "insert into person_item values (default, %d, " % person_id
         for it_id in it_ids:
             cursor.execute(req + "%d);" % it_id)
-        os.system("rm %s" % answer_path)
+        # os.system("rm %s" % answer_path)
     else:
         print("no %s for player %s" % (answer_path, alg_dir))
         cursor.execute("insert into person_item values (default ,%d,%d)" % (person_id, no_answer_id))
