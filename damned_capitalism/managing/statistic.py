@@ -23,7 +23,7 @@ def store_all_parties(cursor, file_name):
     os.system("touch %s" % abs_file)
     os.system("chmod 666 %s" % abs_file)
 
-    cursor.execute("copy (select * from party order by party_id, score) to '%s/%s';" % (abs_dir, file_name))
+    cursor.execute("copy (select * from party order by party_id, score desc) to '%s/%s';" % (abs_dir, file_name))
 
 
 def store_last_party(cursor,file_name):
